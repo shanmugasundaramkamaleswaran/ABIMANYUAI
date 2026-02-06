@@ -1,0 +1,361 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Divine Cosmic Palette */
+    --background: 260 60% 8%;
+    --foreground: 45 100% 96%;
+
+    --card: 260 40% 12%;
+    --card-foreground: 45 100% 96%;
+
+    --popover: 260 40% 12%;
+    --popover-foreground: 45 100% 96%;
+
+    /* Sacred Saffron */
+    --primary: 30 100% 50%;
+    --primary-foreground: 260 60% 8%;
+
+    /* Deep Purple */
+    --secondary: 280 40% 20%;
+    --secondary-foreground: 45 100% 96%;
+
+    /* Muted Violet */
+    --muted: 260 30% 18%;
+    --muted-foreground: 45 20% 70%;
+
+    /* Divine Gold Accent */
+    --accent: 45 100% 50%;
+    --accent-foreground: 260 60% 8%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 45 100% 96%;
+
+    --border: 260 30% 25%;
+    --input: 260 30% 15%;
+    --ring: 45 100% 50%;
+
+    --radius: 1rem;
+
+    /* Divine Gradients */
+    --gradient-divine: linear-gradient(135deg, hsl(30 100% 50%) 0%, hsl(45 100% 55%) 50%, hsl(30 100% 50%) 100%);
+    --gradient-cosmic: linear-gradient(180deg, hsl(260 60% 8%) 0%, hsl(270 50% 12%) 50%, hsl(260 60% 8%) 100%);
+    --gradient-gold-shimmer: linear-gradient(90deg, hsl(45 100% 50%) 0%, hsl(40 100% 60%) 50%, hsl(45 100% 50%) 100%);
+
+    /* Glassmorphism */
+    --glass-bg: rgba(30, 20, 50, 0.6);
+    --glass-border: rgba(255, 215, 0, 0.2);
+
+    /* Shadows */
+    --shadow-divine: 0 0 30px -5px hsl(45 100% 50% / 0.3);
+    --shadow-soft: 0 8px 32px -8px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 60px -10px hsl(30 100% 50% / 0.4);
+
+    --sidebar-background: 260 60% 8%;
+    --sidebar-foreground: 45 100% 96%;
+    --sidebar-primary: 30 100% 50%;
+    --sidebar-primary-foreground: 260 60% 8%;
+    --sidebar-accent: 45 100% 50%;
+    --sidebar-accent-foreground: 260 60% 8%;
+    --sidebar-border: 260 30% 25%;
+    --sidebar-ring: 45 100% 50%;
+
+    --bg-gradient-main: radial-gradient(ellipse at top, hsl(270 50% 15%) 0%, hsl(260 60% 8%) 50%, hsl(240 50% 5%) 100%);
+  }
+
+
+  .dark {
+    --background: 260 60% 8%;
+    --foreground: 45 100% 96%;
+    --card: 260 40% 12%;
+    --card-foreground: 45 100% 96%;
+    --popover: 260 40% 12%;
+    --popover-foreground: 45 100% 96%;
+    --primary: 30 100% 50%;
+    --primary-foreground: 260 60% 8%;
+    --secondary: 280 40% 20%;
+    --secondary-foreground: 45 100% 96%;
+    --muted: 260 30% 18%;
+    --muted-foreground: 45 20% 70%;
+    --accent: 45 100% 50%;
+    --accent-foreground: 260 60% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 45 100% 96%;
+    --border: 260 30% 25%;
+    --input: 260 30% 15%;
+    --ring: 45 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg-gradient-main);
+    background-attachment: fixed;
+    @apply text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
+  }
+
+  h4,
+  h5,
+  h6 {
+    font-family: 'Cormorant Garamond', serif;
+  }
+}
+
+@layer components {
+  .gradient-divine {
+    background: var(--gradient-divine);
+  }
+
+  .gradient-cosmic {
+    background: var(--gradient-cosmic);
+  }
+
+  .gradient-gold {
+    background: var(--gradient-gold-shimmer);
+  }
+
+  .glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+  }
+
+  .glass-input {
+    background: rgba(20, 10, 40, 0.7);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .shadow-divine {
+    box-shadow: var(--shadow-divine);
+  }
+
+  .shadow-soft {
+    box-shadow: var(--shadow-soft);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .text-gradient {
+    background: var(--gradient-divine);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-gold {
+    background: var(--gradient-gold-shimmer);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .divine-border {
+    border: 1px solid transparent;
+    background: linear-gradient(var(--glass-bg), var(--glass-bg)) padding-box,
+      var(--gradient-divine) border-box;
+  }
+
+  .golden-glow {
+    box-shadow:
+      0 0 20px hsl(45 100% 50% / 0.3),
+      0 0 40px hsl(45 100% 50% / 0.2),
+      0 0 60px hsl(45 100% 50% / 0.1);
+  }
+
+  .abimanyu-title {
+    color: #2563eb !important;
+    /* Vivid Blue 600 */
+    font-weight: 700 !important;
+    text-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+  }
+}
+
+@layer utilities {
+  @keyframes breathe {
+
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.4;
+    }
+
+    50% {
+      transform: scale(1.1);
+      opacity: 0.7;
+    }
+  }
+
+  @keyframes sway {
+
+    0%,
+    100% {
+      transform: rotate(-10deg) translateX(-10px);
+    }
+
+    50% {
+      transform: rotate(10deg) translateX(10px);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-glow {
+
+    0%,
+    100% {
+      box-shadow: 0 0 20px hsl(45 100% 50% / 0.3);
+    }
+
+    50% {
+      box-shadow: 0 0 40px hsl(45 100% 50% / 0.5);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% center;
+    }
+
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  @keyframes rotate-slow {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes rotate-sacred {
+    0% {
+      transform: rotate(0deg) scale(0.8);
+      opacity: 0;
+    }
+
+    50% {
+      transform: rotate(180deg) scale(1.1);
+      opacity: 0.6;
+    }
+
+    100% {
+      transform: rotate(360deg) scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes twinkle {
+
+    0%,
+    100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 1;
+      transform: scale(1.2);
+    }
+  }
+
+  .animate-breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .animate-sway {
+    animation: sway 6s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .sacred-mandala {
+    position: absolute;
+    inset: -15px;
+    background: radial-gradient(circle, transparent 40%, hsl(45 100% 50% / 0.15) 100%);
+    border: 1px dashed hsl(45 100% 50% / 0.2);
+    animation: rotate-sacred 12s linear infinite;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsl(260 60% 8%);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(260 30% 25%);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(45 100% 50% / 0.5);
+}
+
+/* Selection */
+::selection {
+  background: hsl(45 100% 50% / 0.3);
+  color: hsl(45 100% 96%);
+}
