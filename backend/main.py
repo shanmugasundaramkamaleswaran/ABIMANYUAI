@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 import uvicorn
+import os
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, EmailStr
 from fastapi.middleware.cors import CORSMiddleware
@@ -56,9 +57,28 @@ def startup():
     t = Thread(target=_init_rag_bg, daemon=True)
     t.start()
 
+# Build allowed origins from env or use defaults
+_vercel_url = os.getenv("VERCEL_FRONTEND_URL", "")
+_allowed_origins = [
+    "https://localhost:8080", 
+    "https://localhost:8081",
+    "https://127.0.0.1:8080",
+    "https://127.0.0.1:8081",
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "http://127.0.0.1:8080",
+    "http://127.0.0.1:8081",
+]
+# Add Vercel URLs if set
+if _vercel_url:
+    _allowed_origins.append(_vercel_url)
+# Also allow any *.vercel.app subdomain for preview deployments
+_allowed_origins.append("https://abimanyuai.vercel.app")
+_allowed_origins.append("https://abimanyu-ai.vercel.app")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -147,6 +167,7 @@ class ChatResponse(BaseModel):
     reply: str
     sentiment: str
     audio: Optional[str] = None
+    mood: Optional[str] = None
 
 class ChatHistoryItem(BaseModel):
     id: int
@@ -245,32 +266,32 @@ def register(request: RegisterRequest, db: Session = Depends(get_db)):
 @app.post("/auth/login", response_model=AuthResponse)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     """Login with email and password."""
-    print(f"🔐 Login attempt for: {request.email}")
+    print(f"Login attempt for: {request.email}")
     
     user = db.query(User).filter(User.email == request.email).first()
     
     if not user:
-        print(f"❌ User not found: {request.email}")
+        print(f"User not found: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
     
     if not user.password_hash:
-        print(f"❌ User has no password hash: {request.email}")
+        print(f"User has no password hash: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
     
     if not verify_password(request.password, user.password_hash):
-        print(f"❌ Password verification failed for: {request.email}")
+        print(f"Password verification failed for: {request.email}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password"
         )
     
-    print(f"✅ Login successful for: {request.email}")
+    print(f"Login successful for: {request.email}")
     access_token = create_access_token(data={"sub": str(user.id)})
     
     return AuthResponse(
@@ -380,7 +401,7 @@ async def chat(
                 })
 
         # Get AI response (now async)
-        reply = await ai_response(request.message, history=history)
+        reply, mood = await ai_response(request.message, history=history)
         
         # Analyze sentiment
         sentiment = analyze_sentiment(request.message)
@@ -398,7 +419,7 @@ async def chat(
         # Generate audio (optional)
         audio_b64 = get_audio_base64(reply)
         
-        return ChatResponse(reply=reply, sentiment=sentiment, audio=audio_b64)
+        return ChatResponse(reply=reply, sentiment=sentiment, audio=audio_b64, mood=mood)
     
     except Exception as e:
         print(f"Chat Error: {e}")
@@ -472,11 +493,23 @@ def rag_status():
         return {"status": "error", "message": str(e)}
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "main:app", 
-        host="0.0.0.0", 
-        port=8000, 
-        reload=False,
-        ssl_keyfile="key.pem", 
-        ssl_certfile="cert.pem"
-    )
+    port = int(os.getenv("PORT", 8000))
+    is_production = os.getenv("RENDER", False)
+    
+    if is_production:
+        # Production: Render handles SSL, bind to 0.0.0.0
+        uvicorn.run(
+            "main:app", 
+            host="0.0.0.0", 
+            port=port
+        )
+    else:
+        # Local development: use self-signed SSL certs
+        uvicorn.run(
+            "main:app", 
+            host="127.0.0.1", 
+            port=port, 
+            reload=True,
+            ssl_keyfile="key.pem", 
+            ssl_certfile="cert.pem"
+        )

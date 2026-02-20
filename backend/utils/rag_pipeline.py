@@ -1,6 +1,6 @@
 """
 RAG (Retrieval Augmented Generation) Pipeline
-PDF → Chunking → Embedding → Vector Store → Query Matching → LLM
+PDF  Chunking  Embedding  Vector Store  Query Matching  LLM
 Prevents memory crashes by loading only relevant chunks instead of entire PDFs
 """
 
@@ -88,7 +88,7 @@ class RAGPipeline:
                 text = self.extract_text_from_pdf(pdf_path)
                 chunks = self.chunk_text(text)
                 all_chunks.extend(chunks)
-                print(f"  → Extracted {len(chunks)} chunks")
+                print(f"   Extracted {len(chunks)} chunks")
             
             if not all_chunks:
                 print("No chunks generated from PDFs")
@@ -112,7 +112,7 @@ class RAGPipeline:
             with open(self.chunks_path, "wb") as f:
                 pickle.dump(self.chunks, f)
             
-            print(f"✅ Index built successfully! Total chunks: {len(all_chunks)}")
+            print(f"Index built successfully! Total chunks: {len(all_chunks)}")
             return True
             
         except Exception as e:
@@ -126,7 +126,7 @@ class RAGPipeline:
                 self.vector_store = faiss.read_index(self.index_path)
                 with open(self.chunks_path, "rb") as f:
                     self.chunks = pickle.load(f)
-                print(f"✅ Loaded existing index with {len(self.chunks)} chunks")
+                print(f"Loaded existing index with {len(self.chunks)} chunks")
                 return True
         except Exception as e:
             print(f"Could not load index: {e}")
@@ -181,7 +181,7 @@ class RAGPipeline:
         if not chunks:
             return ""
         
-        context = "📚 **Relevant Knowledge from Texts:**\n\n"
+        context = "**Relevant Knowledge from Texts:**\n\n"
         total_chars = 0
         
         for i, chunk in enumerate(chunks, 1):
@@ -200,7 +200,7 @@ class RAGPipeline:
             os.remove(self.index_path)
         if os.path.exists(self.chunks_path):
             os.remove(self.chunks_path)
-        print("✅ Index cleared")
+        print("Index cleared")
 
 
 # Global RAG instance

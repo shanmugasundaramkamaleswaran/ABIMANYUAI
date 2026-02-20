@@ -1,0 +1,15 @@
+{
+    "name": "abimanyu-ai-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "install:all": "npm install --prefix frontend && pip install -r backend/requirements.txt",
+        "backend": "cd backend && python main.py",
+        "frontend": "npm run dev --prefix frontend",
+        "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+        "check": "python scripts/check_health.py"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

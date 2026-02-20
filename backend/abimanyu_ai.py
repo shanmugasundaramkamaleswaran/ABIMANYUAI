@@ -29,7 +29,7 @@ GITA_VERSES = {
     "confusion": [
         "You have a right to your duty, but not to its results. (Chapter 2, Verse 47)",
         "Perform your duty equanimously, O Arjuna, abandoning all attachment to success or failure. (Chapter 2, Verse 48)",
-        "Better is one’s own dharma though imperfectly performed than another’s dharma well performed. (Chapter 3, Verse 35)"
+        "Better is one's own dharma though imperfectly performed than another's dharma well performed. (Chapter 3, Verse 35)"
     ],
     "weakness": [
         "Yield not to unmanliness, O son of Pritha. It does not become you. (Chapter 2, Verse 3)",
@@ -133,15 +133,15 @@ def build_abimanyu_response(user_text, gita_wisdom, fighter_story, is_greeting):
         return f"Namaste! I am Abimanyu, your companion on the path of Dharma. I feel your energy today. How can I offer you clarity or strength?"
 
     response = "I hear your struggle, and I sense your heart. You are a warrior of light, and you are never alone.\n\n"
-    response += "📖 **Eternal Wisdom from the Bhagavad Gita:**\n"
+    response += "**Eternal Wisdom from the Bhagavad Gita:**\n"
     response += "> " + gita_wisdom + "\n\n"
 
     if fighter_story:
-        response += "🇮🇳 **Heroic Legacy of India:**\n"
+        response += "**Heroic Legacy of India:**\n"
         response += "*\"" + fighter_story + "\"*\n\n"
 
     response += "Let these words be your shield and your torch. Remember, every challenge is an invitation to grow stronger.\n"
-    response += "— **Abimanyu**"
+    response += "- **Abimanyu**"
     return response
 
 async def ai_response(user_input: str, history: Optional[List[Dict[str, str]]] = None):
@@ -175,12 +175,12 @@ async def ai_response(user_input: str, history: Optional[List[Dict[str, str]]] =
     1. IF 'Is Greeting' is True: Respond as a divine guide. Use words like "Namaste", "Pranam", or "Blessings". Be warm and ask how you can help them navigate their Dharma today. Keep it brief.
     2. IF 'Is Greeting' is False: 
        - Validate their feelings with deep empathy.
-       - Explicitly integrate the provided Gita Wisdom under the heading "📖 Eternal Wisdom from the Bhagavad Gita:".
-       - Explicitly integrate the provided Heroic Story under the heading "🇮🇳 Heroic Legacy of India:".
+       - Explicitly integrate the provided Gita Wisdom under the heading "Eternal Wisdom from the Bhagavad Gita:".
+       - Explicitly integrate the provided Heroic Story under the heading "Heroic Legacy of India:".
        - If PDF context is relevant, weave it into your guidance naturally.
        - Use markdown for a premium feel (bolding, blockquotes).
        - Conclude with a powerful, motivating sentence about growth and Dharma.
-       - Sign off as "— Abimanyu".
+       - Sign off as " Abimanyu".
 
     TONE: Divine, serene, yet powerful. Use the wisdom and story provided as the soul of your response.
     """
@@ -189,9 +189,9 @@ async def ai_response(user_input: str, history: Optional[List[Dict[str, str]]] =
         # Use AI Service for enhanced connectivity (Gemini/OpenAI)
         response_text = await ai_service.get_response(PROMPT, history=history)
         if response_text:
-            return response_text
+            return response_text, emotion
     except Exception as e:
         print(f"AI Service Error: {e}. Falling back to local logic.")
 
     # Fallback to local deterministic response if AI service fails
-    return build_abimanyu_response(user_input, gita_wisdom, fighter_story, is_greeting)
+    return build_abimanyu_response(user_input, gita_wisdom, fighter_story, is_greeting), emotion

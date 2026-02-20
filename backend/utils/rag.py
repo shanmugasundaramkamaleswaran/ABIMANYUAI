@@ -1,6 +1,6 @@
 """
 RAG (Retrieval Augmented Generation) Pipeline - Lightweight Version
-Chunks PDFs → Creates embeddings → Stores in vector DB → Retrieves relevant chunks for LLM
+Chunks PDFs  Creates embeddings  Stores in vector DB  Retrieves relevant chunks for LLM
 """
 
 import os
@@ -72,7 +72,7 @@ class RAGPipeline:
             search_kwargs={"k": 3}  # Retrieve top 3 relevant chunks
         )
         
-        print("✅ RAG Pipeline initialized")
+        print("RAG Pipeline initialized")
     
     def chunk_text(self, text: str, chunk_size: int = 500, overlap: int = 100) -> List[str]:
         """Split text into chunks with overlap"""
@@ -116,7 +116,7 @@ class RAGPipeline:
             retriever = self.vectorstore.as_retriever(
                 search_kwargs={"k": k}
             )
-            results = retriever.get_relevant_documents(query)
+            results = retriever.invoke(query)
             
             # Extract text from documents
             chunks = [doc.page_content for doc in results]
@@ -190,7 +190,7 @@ def init_rag(pdf_dir: str = "data/extracted"):
                         metadata={"source": txt_file.name}
                     )
             except Exception as e:
-                print(f"❌ Error loading {txt_file.name}: {str(e)}")
+                print(f"Error loading {txt_file.name}: {str(e)}")
     
     return rag_pipeline
 

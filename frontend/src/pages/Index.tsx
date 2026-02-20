@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
 import WelcomeHeader from "@/components/WelcomeHeader";
 import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
@@ -7,12 +8,16 @@ import MentalHealthGraph from "@/components/MentalHealthGraph";
 import { sendMessage, getChatHistory, clearChatHistory } from "@/lib/api";
 import { welcomeMessage } from "@/lib/abimanyu-responses";
 import { useAuth } from "@/lib/AuthContext";
-import { LogOut, Trash2, X } from "lucide-react";
+import { LogOut, Trash2, X, Wind } from "lucide-react";
+import ThirukkuralCard from "@/components/ThirukkuralCard";
+import BreathingCircle from "@/components/BreathingCircle";
+import { getDailyKural } from "@/lib/thirukkural";
 
 interface Message {
   id: string;
   text: string;
   isAbimanyu: boolean;
+  mood?: string;
 }
 
 const Index = () => {
@@ -22,6 +27,7 @@ const Index = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [showTracker, setShowTracker] = useState(false);
+  const [isCalmActive, setIsCalmActive] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load chat history on mount
@@ -75,7 +81,8 @@ const Index = () => {
       const abimanyuMessage: Message = {
         id: `abimanyu-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         text: response.reply,
-        isAbimanyu: true
+        isAbimanyu: true,
+        mood: response.mood
       };
 
       setMessages(prev => [...prev, abimanyuMessage]);
@@ -120,6 +127,28 @@ const Index = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
+    }
+  };
+
+  const toggleEmergencyCalm = () => {
+    if (isCalmActive) {
+      setIsCalmActive(false);
+      if (window.speechSynthesis) window.speechSynthesis.cancel();
+    } else {
+      setIsCalmActive(true);
+
+      // Slow TTS
+      const speak = () => {
+        const msg = new SpeechSynthesisUtterance("meditate and control your mind follow the breathing");
+        msg.rate = 0.6; // Extra slow
+        window.speechSynthesis.speak(msg);
+      };
+
+      if (window.speechSynthesis.getVoices().length === 0) {
+        window.speechSynthesis.addEventListener('voiceschanged', speak, { once: true });
+      } else {
+        speak();
+      }
     }
   };
 
@@ -168,6 +197,21 @@ const Index = () => {
             </div>
 
             <TopMenu onOpenTracker={() => setShowTracker(true)} />
+
+            <button
+              onClick={toggleEmergencyCalm}
+              className={cn(
+                "flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-500 group",
+                isCalmActive
+                  ? "bg-amber-500 text-white shadow-glow"
+                  : "bg-white/5 hover:bg-white/10 text-amber-200/70 hover:text-amber-100 border border-white/10"
+              )}
+            >
+              <Wind className={cn("w-3.5 h-3.5", isCalmActive && "animate-spin-slow")} />
+              <span className="text-[10px] font-bold uppercase tracking-widest hidden sm:inline">
+                {isCalmActive ? "Session Active" : "I feel overwhelmed"}
+              </span>
+            </button>
           </div>
 
           {/* Right Side Profile & Actions */}
@@ -211,8 +255,24 @@ const Index = () => {
 
       {/* Main Content Container */}
       <div className="relative flex-1 flex flex-col max-w-4xl mx-auto w-full px-4 sm:px-6">
+        {/* Breathing Circle Overlay */}
+        {isCalmActive && (
+          <div className="fixed left-8 top-1/2 -translate-y-1/2 hidden xl:block pointer-events-none">
+            <BreathingCircle />
+          </div>
+        )}
+
+        {isCalmActive && (
+          <div className="flex justify-center my-4 xl:hidden">
+            <BreathingCircle />
+          </div>
+        )}
+
         {/* Header */}
         <WelcomeHeader />
+
+        {/* Daily Wisdom Section */}
+        <ThirukkuralCard kural={getDailyKural()} />
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto py-6 space-y-6 flex flex-col">
@@ -222,6 +282,7 @@ const Index = () => {
               message={message.text}
               isAbimanyu={message.isAbimanyu}
               showLeaf={index === 0 && message.isAbimanyu}
+              mood={message.mood}
             />
           ))}
 
@@ -256,6 +317,40 @@ const Index = () => {
 
         {/* Input Area */}
         <div className="sticky bottom-0 py-6">
+          {messages.length > 1 && messages[messages.length - 1].isAbimanyu && messages[messages.length - 1].mood && (
+            <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-fit animate-in fade-in slide-in-from-bottom-2 duration-500">
+              <div className="glass-card px-4 py-2 flex flex-col items-center gap-1 border border-amber-500/30 shadow-divine backdrop-blur-md">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] uppercase tracking-wider font-bold text-amber-200">
+                    Detected Mood: {
+                      (() => {
+                        const lastMsg = messages[messages.length - 1];
+                        const mood = lastMsg.mood;
+                        if (!mood) return "None";
+                        const map: Record<string, string> = {
+                          fear: "Anxiety",
+                          anger: "Anger",
+                          grief: "Sorrow",
+                          confusion: "Confusion",
+                          weakness: "Weakness",
+                          patience: "Patience",
+                          determination: "Determination",
+                          sacrifice: "Sacrifice",
+                          bravery: "Courage"
+                        };
+                        return map[mood] || mood;
+                      })()
+                    }
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 px-2 py-0.5 bg-amber-500/10 rounded-full">
+                  <span className="text-[9px] uppercase tracking-widest font-medium text-amber-100/80">
+                    Abimanyu Guidance Mode Activated
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
           <ChatInput onSend={handleSendMessage} disabled={isTyping} />
         </div>
       </div>
