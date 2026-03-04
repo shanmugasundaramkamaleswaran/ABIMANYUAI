@@ -507,7 +507,7 @@ if __name__ == "__main__":
         # Local development: use self-signed SSL certs
         uvicorn.run(
             "main:app", 
-            host="127.0.0.1", 
+            host="0.0.0.0", 
             port=port, 
             reload=True,
             ssl_keyfile="key.pem", 
