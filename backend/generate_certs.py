@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives import serialization
 import datetime
+import ipaddress
 
 def generate_self_signed_cert():
     # Generate private key
@@ -36,7 +37,10 @@ def generate_self_signed_cert():
     ).not_valid_after(
         datetime.datetime.utcnow() + datetime.timedelta(days=365)
     ).add_extension(
-        x509.SubjectAlternativeName([x509.DNSName(u"localhost")]),
+        x509.SubjectAlternativeName([
+            x509.DNSName(u"localhost"),
+            x509.IPAddress(ipaddress.ip_address(u"127.0.0.1"))
+        ]),
         critical=False,
     ).sign(private_key, hashes.SHA256(), default_backend())
 

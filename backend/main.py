@@ -24,7 +24,6 @@ from auth import (
     decode_access_token,
     verify_google_token
 )
-from utils.rag import init_rag
 
 app = FastAPI(title="Abimanyu AI", version="2.0")
 
@@ -42,20 +41,10 @@ class LimitedBodyMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(LimitedBodyMiddleware)
 
-# Initialize database and RAG on startup
+# Initialize database on startup
 @app.on_event("startup")
 def startup():
     init_db()
-
-    # Initialize RAG in a background thread so server startup isn't blocked
-    def _init_rag_bg():
-        try:
-            init_rag()
-        except Exception as e:
-            print("RAG initialization failed:", e)
-
-    t = Thread(target=_init_rag_bg, daemon=True)
-    t.start()
 
 # Build allowed origins from env or use defaults
 _vercel_url = os.getenv("VERCEL_FRONTEND_URL", "")
@@ -87,17 +76,6 @@ app.add_middleware(
 @app.get("/health")
 def health_check():
     return {"status": "healthy", "timestamp": datetime.now()}
-
-@app.get("/rag/stats")
-def rag_stats():
-    """Get RAG pipeline statistics"""
-    from utils.rag import get_rag
-    try:
-        rag = get_rag()
-        stats = rag.get_stats()
-        return {"success": True, "data": stats}
-    except Exception as e:
-        return {"success": False, "error": str(e)}
 
 @app.post("/test/create-demo-user")
 def create_demo_user(db: Session = Depends(get_db)):
@@ -463,35 +441,6 @@ def clear_chat_history(
     db.commit()
     return {"message": "Chat history cleared"}
 
-# ========== RAG MANAGEMENT ENDPOINTS ==========
-@app.post("/admin/rag/rebuild")
-def rebuild_rag_index():
-    """Rebuild vector index from PDFs (admin only)"""
-    try:
-        from utils.rag_pipeline import get_rag_pipeline
-        rag = get_rag_pipeline()
-        success = rag.build_index()
-        if success:
-            return {"status": "success", "message": f"RAG index rebuilt with {len(rag.chunks)} chunks"}
-        else:
-            return {"status": "error", "message": "Failed to build index"}
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
-@app.get("/admin/rag/status")
-def rag_status():
-    """Get RAG pipeline status"""
-    try:
-        from utils.rag_pipeline import get_rag_pipeline
-        rag = get_rag_pipeline()
-        return {
-            "status": "ready" if rag.vector_store else "not_ready",
-            "chunks_count": len(rag.chunks),
-            "model": rag.model_name
-        }
-    except Exception as e:
-        return {"status": "error", "message": str(e)}
-
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     is_production = os.getenv("RENDER", False)
@@ -504,12 +453,10 @@ if __name__ == "__main__":
             port=port
         )
     else:
-        # Local development: use self-signed SSL certs
+        # Local development: use HTTP (more reliable for browser connectivity)
         uvicorn.run(
             "main:app", 
             host="0.0.0.0", 
             port=port, 
-            reload=True,
-            ssl_keyfile="key.pem", 
-            ssl_certfile="cert.pem"
+            reload=True
         )

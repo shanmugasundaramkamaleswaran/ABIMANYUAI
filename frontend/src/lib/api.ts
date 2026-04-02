@@ -1,9 +1,10 @@
-const API_URL = 'https://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 export interface ChatResponse {
   reply: string;
   sentiment: string;
   audio?: string;
+  mood?: string;
 }
 
 export interface ChatHistoryItem {
@@ -55,8 +56,16 @@ export async function sendMessage(message: string): Promise<ChatResponse> {
     }
 
     if (error instanceof TypeError && error.message.includes('fetch')) {
-      console.error("Connection Failed: Please ensure the backend is running.", error);
-      throw new Error('Connection failed. Please ensure the backend is running at http://localhost:8000');
+      console.error(`Connection Failed: ${API_URL}/chat`, error);
+      throw new Error(
+        `Divine connection refused. 
+        
+        To fix this:
+        1. Ensure the backend is running (run 'npm run check').
+        2. Visit ${API_URL}/health in a new tab.
+        3. Click 'Advanced' and 'Proceed' to trust the SSL certificate.
+        4. Refresh this page.`
+      );
     }
 
     throw error;

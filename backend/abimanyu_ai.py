@@ -2,7 +2,6 @@ import os
 import random
 from typing import List, Dict, Optional
 from dotenv import load_dotenv
-from utils.rag import get_rag
 from services.ai_service import ai_service
 
 # Load environment variables
@@ -152,10 +151,6 @@ async def ai_response(user_input: str, history: Optional[List[Dict[str, str]]] =
     gita_wisdom = random.choice(GITA_VERSES.get(emotion, GITA_VERSES["bravery"]))
     fighter_story = random.choice(FIGHTER_STORIES.get(emotion, FIGHTER_STORIES["bravery"]))
 
-    # Get relevant context from sacred texts via RAG
-    rag = get_rag()
-    pdf_context = rag.get_context(user_input, k=3) if rag else ""
-
     # SYSTEM PROMPT with personality and context
     PROMPT = f"""
     YOU ARE ABIMANYU AI, a divine and brave guide inspired by the Bhagavad Gita and India's heroic history.
@@ -167,9 +162,6 @@ async def ai_response(user_input: str, history: Optional[List[Dict[str, str]]] =
     - Detected Emotion: {emotion}
     - Gita Wisdom to include: "{gita_wisdom}"
     - Hero Story to include: "{fighter_story}"
-    
-    CONTEXT FROM SACRED TEXTS:
-    {pdf_context if pdf_context else "No additional context available"}
 
     INSTRUCTIONS:
     1. IF 'Is Greeting' is True: Respond as a divine guide. Use words like "Namaste", "Pranam", or "Blessings". Be warm and ask how you can help them navigate their Dharma today. Keep it brief.
@@ -177,7 +169,6 @@ async def ai_response(user_input: str, history: Optional[List[Dict[str, str]]] =
        - Validate their feelings with deep empathy.
        - Explicitly integrate the provided Gita Wisdom under the heading "Eternal Wisdom from the Bhagavad Gita:".
        - Explicitly integrate the provided Heroic Story under the heading "Heroic Legacy of India:".
-       - If PDF context is relevant, weave it into your guidance naturally.
        - Use markdown for a premium feel (bolding, blockquotes).
        - Conclude with a powerful, motivating sentence about growth and Dharma.
        - Sign off as " Abimanyu".
