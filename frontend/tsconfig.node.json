@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2023"],
+    "types": ["node"],
     "module": "ESNext",
     "skipLibCheck": true,
 
@@ -11,6 +12,10 @@
     "isolatedModules": true,
     "moduleDetection": "force",
     "noEmit": true,
+
+    "composite": true,
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
 
     /* Linting */
     "strict": true,
