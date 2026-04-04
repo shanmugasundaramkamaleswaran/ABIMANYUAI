@@ -10,7 +10,7 @@ requests
 elevenlabs
 sqlalchemy
 passlib[bcrypt]
-python-jose[cryptography]
+PyJWT
 aiosqlite
 pdfplumber
 langchain
@@ -19,3 +19,4 @@ sentence-transformers
 faiss-cpu
 chromadb
 numpy
+python-jose
