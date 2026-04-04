@@ -2,7 +2,7 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 from passlib.context import CryptContext
-from jose import jwt
+import jwt
 from dotenv import load_dotenv
 
 load_dotenv()

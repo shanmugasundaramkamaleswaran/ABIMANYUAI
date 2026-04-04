@@ -374,7 +374,7 @@ async def chat(
             # Convert to service format
             for msg in reversed(recent_msgs):
                 history.append({
-                    "role": "model" if msg.is_ai else "user",
+                    "role": "assistant" if msg.is_ai else "user",
                     "content": msg.content
                 })
 
