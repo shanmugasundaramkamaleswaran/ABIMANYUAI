@@ -24,6 +24,6 @@
     "openai": "^6.33.0",
     "sentiment": "^5.0.2",
     "sequelize": "^6.37.8",
-    "sqlite3": "^6.0.1"
+    "sqlite3": "^5.1.7"
   }
 }
