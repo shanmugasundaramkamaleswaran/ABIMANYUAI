@@ -16,14 +16,16 @@ const BreathingCircle = () => {
             <div className="relative flex items-center justify-center">
                 {/* Outer Glow */}
                 <div
-                    className={`absolute w-40 h-40 rounded-full bg-amber-500/20 blur-2xl transition-all duration-[4s] ease-in-out ${phase === 'inhale' ? 'scale-150 opacity-40' : 'scale-100 opacity-20'
+                    className={`absolute w-40 h-40 rounded-full bg-amber-500/20 blur-2xl transition-all ease-in-out ${phase === 'inhale' ? 'scale-150 opacity-40' : 'scale-100 opacity-20'
                         }`}
+                    style={{ transitionDuration: '4s' }}
                 />
 
                 {/* Main Circle */}
                 <div
-                    className={`relative w-32 h-32 rounded-full border-2 border-amber-500/40 flex items-center justify-center transition-all duration-[4s] ease-in-out ${phase === 'inhale' ? 'scale-150' : 'scale-100'
+                    className={`relative w-32 h-32 rounded-full border-2 border-amber-500/40 flex items-center justify-center transition-all ease-in-out ${phase === 'inhale' ? 'scale-150' : 'scale-100'
                         }`}
+                    style={{ transitionDuration: '4s' }}
                 >
                     <div className="w-full h-full rounded-full bg-gradient-to-br from-amber-500/20 to-purple-500/20 backdrop-blur-sm" />
 
