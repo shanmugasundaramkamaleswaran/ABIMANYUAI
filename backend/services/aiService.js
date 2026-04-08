@@ -106,7 +106,7 @@ function detectEmotion(text) {
 
 async function getRandomGitaExcerpt() {
   try {
-    const filePath = path.join(__dirname, '..', 'bhagavad_gita_text.txt');
+    const filePath = path.join(__dirname, '..', '..', 'bhagavad_gita_text.txt');
     const text = await fs.readFile(filePath, 'utf-8');
     
     if (text.length > 4000) {
