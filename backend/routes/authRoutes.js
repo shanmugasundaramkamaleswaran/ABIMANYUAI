@@ -8,6 +8,7 @@ const {
   verifyGoogleToken 
 } = require('../services/authService');
 const { authMiddleware } = require('../middleware/auth');
+const { Op } = require('sequelize');
 
 /**
  * Register a new user.
@@ -97,7 +98,7 @@ router.post('/google', async (req, res) => {
 
     let user = await User.findOne({ 
       where: { 
-        [express.Op ? express.Op.or : 'or']: [{ email }, { google_id: googleId }] 
+        [Op.or]: [{ email }, { google_id: googleId }] 
       } 
     });
 
