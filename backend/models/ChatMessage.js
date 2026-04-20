@@ -24,6 +24,14 @@ const ChatMessage = sequelize.define('ChatMessage', {
     type: DataTypes.BOOLEAN,
     defaultValue: false
   },
+  emotion: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  sentiment: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   timestamp: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

@@ -88,8 +88,22 @@ async function startServer() {
     await sequelize.authenticate();
     console.log('Database connected.');
     
-    // Sync models (don't force to avoid data loss)
+    // Sync models without alter first (safe)
     await sequelize.sync({ alter: false });
+
+    // Safely add new columns if they don't exist (raw SQL)
+    const queryInterface = sequelize.getQueryInterface();
+    const tableDescription = await queryInterface.describeTable('chat_messages').catch(() => null);
+    if (tableDescription) {
+      if (!tableDescription.emotion) {
+        await sequelize.query(`ALTER TABLE chat_messages ADD COLUMN emotion TEXT;`);
+        console.log('[DB] Added emotion column to chat_messages');
+      }
+      if (!tableDescription.sentiment) {
+        await sequelize.query(`ALTER TABLE chat_messages ADD COLUMN sentiment TEXT;`);
+        console.log('[DB] Added sentiment column to chat_messages');
+      }
+    }
     
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server running on port ${PORT}`);

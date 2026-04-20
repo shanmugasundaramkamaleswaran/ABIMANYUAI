@@ -8,17 +8,8 @@ import {
     ResponsiveContainer,
     ReferenceLine,
 } from "recharts";
-import { Info, Target, TrendingUp, Sparkles } from "lucide-react";
-
-const data = [
-    { date: "01 Feb", mood: 4, strength: 3, stress: 7 },
-    { date: "02 Feb", mood: 5, strength: 4, stress: 6 },
-    { date: "03 Feb", mood: 6, strength: 5, stress: 5 },
-    { date: "04 Feb", mood: 5, strength: 6, stress: 4 },
-    { date: "05 Feb", mood: 8, strength: 7, stress: 3 },
-    { date: "06 Feb", mood: 7, strength: 8, stress: 2 },
-    { date: "Today", mood: 9, strength: 9, stress: 1 },
-];
+import { Info, Target, TrendingUp, Sparkles, Loader2 } from "lucide-react";
+import { AnalyticsData } from "@/lib/api";
 
 const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
@@ -45,7 +36,36 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-const MentalHealthGraph = () => {
+interface MentalHealthGraphProps {
+    data: AnalyticsData[];
+    loading?: boolean;
+}
+
+const MentalHealthGraph = ({ data, loading }: MentalHealthGraphProps) => {
+    // Calculate averages and insights based on real data
+    const avgMood = data.length > 0 
+        ? (data.reduce((acc, curr) => acc + curr.mood, 0) / data.length).toFixed(1)
+        : "5.0";
+    
+    const clarity = data.length > 1
+        ? (((data[data.length - 1].mood - data[0].mood) / data[0].mood) * 100).toFixed(0)
+        : "0";
+
+    const getInsight = () => {
+        if (data.length < 2) return "Continue your journey with Abimanyu to build your spiritual profile.";
+        const last = data[data.length - 1];
+        if (last.mood >= 8) return "Your inner peace is flourishing. Your consistency in duty is bearing fruit.";
+        if (last.stress >= 7) return "You are carrying a heavy burden. Remember that you are only responsible for your actions, not the outcomes.";
+        return "Your trajectory is stabilizing. Stay focused on your Dharma.";
+    };
+
+    const getDharmaGoal = () => {
+        if (data.length < 1) return "Initiate your first dialogue.";
+        const last = data[data.length - 1];
+        if (last.strength < 5) return "Focus on building inner strength through detachment.";
+        return "Maintain your current equilibrium and seek higher clarity.";
+    };
+
     return (
         <div className="w-full bg-[#0a0f2c]/95 backdrop-blur-lg rounded-3xl p-8 shadow-2xl border border-white/10 animate-fade-in max-h-[90vh] overflow-y-auto">
             {/* Header Section */}
@@ -61,80 +81,99 @@ const MentalHealthGraph = () => {
                 </div>
 
                 <div className="flex gap-4">
-                    <div className="glass-card px-4 py-2 rounded-2xl border border-white/5 flex flex-col items-center">
+                    <div className="glass-card px-4 py-2 rounded-2xl border border-white/5 flex flex-col items-center min-w-[80px]">
                         <span className="text-[10px] uppercase tracking-tighter text-muted-foreground">Avg. Mood</span>
-                        <span className="text-xl font-bold text-blue-500">7.2</span>
+                        <span className="text-xl font-bold text-blue-500">{avgMood}</span>
                     </div>
-                    <div className="glass-card px-4 py-2 rounded-2xl border border-white/5 flex flex-col items-center">
-                        <span className="text-[10px] uppercase tracking-tighter text-muted-foreground">Clarity</span>
-                        <span className="text-xl font-bold text-amber-400">+15%</span>
+                    <div className="glass-card px-4 py-2 rounded-2xl border border-white/5 flex flex-col items-center min-w-[80px]">
+                        <span className="text-[10px] uppercase tracking-tighter text-muted-foreground">Growth</span>
+                        <span className="text-xl font-bold text-amber-400">{Number(clarity) >= 0 ? '+' : ''}{clarity}%</span>
                     </div>
                 </div>
             </div>
 
             {/* Main Charts Overlay */}
-            <div className="w-full h-[400px] relative group">
-                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none rounded-3xl" />
+            <div className="w-full h-[400px] relative group flex items-center justify-center">
+                {loading ? (
+                    <div className="flex flex-col items-center gap-4 text-amber-500/50">
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <span className="text-sm tracking-widest uppercase font-bold">Consulting Akashic Records...</span>
+                    </div>
+                ) : (
+                    <>
+                        <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-transparent pointer-events-none rounded-3xl" />
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
+                                <defs>
+                                    <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
+                                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+                                    </linearGradient>
+                                    <linearGradient id="colorStrength" x1="0" y1="0" x2="0" y2="1">
+                                        <stop offset="5%" stopColor="#d97706" stopOpacity={0.2} />
+                                        <stop offset="95%" stopColor="#d97706" stopOpacity={0} />
+                                    </linearGradient>
+                                </defs>
 
-                <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-                        <defs>
-                            <linearGradient id="colorMood" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                            </linearGradient>
-                            <linearGradient id="colorStrength" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#d97706" stopOpacity={0.2} />
-                                <stop offset="95%" stopColor="#d97706" stopOpacity={0} />
-                            </linearGradient>
-                        </defs>
+                                <CartesianGrid
+                                    strokeDasharray="3 3"
+                                    vertical={false}
+                                    stroke="rgba(255,255,255,0.03)"
+                                />
 
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                            vertical={false}
-                            stroke="rgba(255,255,255,0.03)"
-                        />
+                                <XAxis
+                                    dataKey="date"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: 300 }}
+                                    dy={15}
+                                />
 
-                        <XAxis
-                            dataKey="date"
-                            axisLine={false}
-                            tickLine={false}
-                            tick={{ fill: 'rgba(255,255,255,0.3)', fontSize: 11, fontWeight: 300 }}
-                            dy={15}
-                        />
+                                <YAxis
+                                    hide={true}
+                                    domain={[0, 10]}
+                                />
 
-                        <YAxis
-                            hide={true}
-                            domain={[0, 10]}
-                        />
+                                <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
 
-                        <Tooltip content={<CustomTooltip />} isAnimationActive={false} />
+                                <ReferenceLine y={5} stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" label={{ position: 'right', value: 'Equilibrium', fill: 'rgba(255,255,255,0.2)', fontSize: 10 }} />
 
-                        <ReferenceLine y={5} stroke="rgba(255,255,255,0.05)" strokeDasharray="3 3" label={{ position: 'right', value: 'Equilibrium', fill: 'rgba(255,255,255,0.2)', fontSize: 10 }} />
+                                <Area
+                                    name="Inner Peace"
+                                    type="monotone"
+                                    dataKey="mood"
+                                    stroke="#2563eb"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#colorMood)"
+                                    animationDuration={1000}
+                                />
 
-                        <Area
-                            name="Inner Peace"
-                            type="monotone"
-                            dataKey="mood"
-                            stroke="#2563eb"
-                            strokeWidth={3}
-                            fillOpacity={1}
-                            fill="url(#colorMood)"
-                            animationDuration={1000}
-                        />
-
-                        <Area
-                            name="Emotional Strength"
-                            type="monotone"
-                            dataKey="strength"
-                            stroke="#d97706"
-                            strokeWidth={3}
-                            fillOpacity={1}
-                            fill="url(#colorStrength)"
-                            animationDuration={1200}
-                        />
-                    </AreaChart>
-                </ResponsiveContainer>
+                                <Area
+                                    name="Emotional Strength"
+                                    type="monotone"
+                                    dataKey="strength"
+                                    stroke="#d97706"
+                                    strokeWidth={3}
+                                    fillOpacity={1}
+                                    fill="url(#colorStrength)"
+                                    animationDuration={1200}
+                                />
+                                
+                                <Area
+                                    name="Stress Level"
+                                    type="monotone"
+                                    dataKey="stress"
+                                    stroke="#ef4444"
+                                    strokeWidth={2}
+                                    strokeDasharray="5 5"
+                                    fill="transparent"
+                                    animationDuration={1400}
+                                />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </>
+                )}
             </div>
 
             {/* Insights Section */}
@@ -147,7 +186,7 @@ const MentalHealthGraph = () => {
                         <h4 className="text-sm font-semibold">Weekly Insight</h4>
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed font-light">
-                        Your inner peace is positively correlating with your consistency in duty. The last 48 hours show a significant rise in resilience.
+                        {getInsight()}
                     </p>
                 </div>
 
@@ -159,7 +198,7 @@ const MentalHealthGraph = () => {
                         <h4 className="text-sm font-semibold">Dharma Goal</h4>
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed font-light">
-                        Focus on maintaining detachment from outcomes. Your "Inner Peace" line is nearing the 9/10 peak. Stay grounded.
+                        {getDharmaGoal()}
                     </p>
                 </div>
 
@@ -168,10 +207,10 @@ const MentalHealthGraph = () => {
                         <div className="p-2 rounded-xl bg-muted/20 text-muted-foreground group-hover:bg-white group-hover:text-black transition-all">
                             <Info className="w-4 h-4" />
                         </div>
-                        <h4 className="text-sm font-semibold">Refinement Area</h4>
+                        <h4 className="text-sm font-semibold">Analysis Status</h4>
                     </div>
                     <p className="text-xs text-muted-foreground leading-relaxed font-light">
-                        Slight dip on Feb 04 coincides with high stress levels. Consider more silent reflection during peak work hours to stabilize.
+                        Showing results from your last {data.length} interactions. Continuous dialogue improves accuracy.
                     </p>
                 </div>
             </div>
@@ -179,10 +218,13 @@ const MentalHealthGraph = () => {
             {/* Action Footer */}
             <div className="mt-8 pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-widest px-4 py-2 bg-white/5 rounded-full border border-white/5">
-                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    Live Analysis Active
+                    <span className={`w-2 h-2 rounded-full ${loading ? 'bg-amber-500 animate-spin' : 'bg-green-500 animate-pulse'}`} />
+                    {loading ? 'Consulting Wisdom...' : 'Live Analysis Active'}
                 </div>
-                <button className="text-xs font-bold abimanyu-title hover:scale-105 transition-all bg-white/5 px-6 py-2 rounded-full border border-blue-500/20 shadow-glow">
+                <button 
+                    disabled={loading || data.length === 0}
+                    className="text-xs font-bold abimanyu-title hover:scale-105 transition-all bg-white/5 px-6 py-2 rounded-full border border-blue-500/20 shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                >
                     Generate Full Spiritual Audit
                 </button>
             </div>

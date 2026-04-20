@@ -8,7 +8,7 @@ import MentalHealthGraph from "@/components/MentalHealthGraph";
 import { sendMessage, getChatHistory, clearChatHistory } from "@/lib/api";
 import { welcomeMessage } from "@/lib/abimanyu-responses";
 import { useAuth } from "@/lib/AuthContext";
-import { LogOut, Trash2, X, Wind } from "lucide-react";
+import { LogOut, Trash2, X, Wind, Languages } from "lucide-react";
 import ThirukkuralCard from "@/components/ThirukkuralCard";
 import BreathingCircle from "@/components/BreathingCircle";
 import { getDailyKural } from "@/lib/thirukkural";
@@ -27,7 +27,29 @@ const Index = () => {
   ]);
   const [isTyping, setIsTyping] = useState(false);
   const [showTracker, setShowTracker] = useState(false);
+  const [trackerData, setTrackerData] = useState<any[]>([]);
+  const [isTrackerLoading, setIsTrackerLoading] = useState(false);
+
+  useEffect(() => {
+    if (showTracker) {
+      const fetchAnalytics = async () => {
+        setIsTrackerLoading(true);
+        try {
+          const { getAnalyticsData } = await import("@/lib/api");
+          const data = await getAnalyticsData();
+          setTrackerData(data);
+        } catch (error) {
+          console.error("Failed to fetch tracker data:", error);
+        } finally {
+          setIsTrackerLoading(false);
+        }
+      };
+      fetchAnalytics();
+    }
+  }, [showTracker]);
+
   const [isCalmActive, setIsCalmActive] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("english");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load chat history on mount
@@ -77,7 +99,7 @@ const Index = () => {
     }
 
     try {
-      const response = await sendMessage(text);
+      const response = await sendMessage(text, selectedLanguage);
       const abimanyuMessage: Message = {
         id: `abimanyu-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         text: response.reply,
@@ -87,21 +109,51 @@ const Index = () => {
 
       setMessages(prev => [...prev, abimanyuMessage]);
 
-      // Use Web Speech API to speak the response
-      if ('speechSynthesis' in window) {
+      if (response.audio) {
+        const audio = new Audio(`data:audio/mp3;base64,${response.audio}`);
+        audio.play().catch(e => console.error("Audio playback error:", e));
+      } else if ('speechSynthesis' in window) {
         const speak = () => {
           const utterance = new SpeechSynthesisUtterance(response.reply);
+          
+          // Map selecting language to BCP 47 language tags
+          const langMap: Record<string, string> = {
+            english: 'en-IN',
+            tamil: 'ta-IN',
+            hindi: 'hi-IN',
+            telugu: 'te-IN'
+          };
+          const targetLang = langMap[selectedLanguage.toLowerCase()] || 'en-IN';
+          const targetLangCode = targetLang.split('-')[0]; // 'ta', 'hi', 'te', 'en'
+          
+          utterance.lang = targetLang;
           utterance.rate = 0.9;
-          utterance.pitch = 1.0;
+          utterance.pitch = 1.0; // Slightly lower pitch for deeper voice
           utterance.volume = 1.0;
 
           const voices = window.speechSynthesis.getVoices();
-          const maleVoice = voices.find(voice =>
-            voice.name.toLowerCase().includes('male') ||
-            voice.name.toLowerCase().includes('david') ||
-            voice.name.toLowerCase().includes('google uk english male')
+          
+          // 1. Try to find a male voice for the specific language
+          let selectedVoice = voices.find(voice => 
+            voice.lang.startsWith(targetLangCode) && 
+            (voice.name.toLowerCase().includes('male') || voice.name.toLowerCase().includes('david'))
           );
-          if (maleVoice) utterance.voice = maleVoice;
+          
+          // 2. If no male voice, just get any voice for that language
+          if (!selectedVoice) {
+            selectedVoice = voices.find(voice => voice.lang.startsWith(targetLangCode));
+          }
+          
+          // 3. Fallback to any Indian voice, then any English male, etc.
+          if (!selectedVoice) {
+             selectedVoice = voices.find(v => v.lang.startsWith('en-IN')) || 
+                             voices.find(v => v.name.toLowerCase().includes('male'));
+          }
+
+          if (selectedVoice) {
+             utterance.voice = selectedVoice;
+          }
+          
           window.speechSynthesis.speak(utterance);
         };
 
@@ -351,6 +403,33 @@ const Index = () => {
               </div>
             </div>
           )}
+          
+          {/* Language Switcher */}
+          <div className="flex items-center justify-center gap-2 mb-3 animate-in fade-in slide-in-from-bottom-1 duration-700">
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-card border border-white/5 shadow-soft">
+              <Languages className="w-3.5 h-3.5 text-amber-500/60" />
+              {[
+                { name: "English", id: "english" },
+                { name: "Tamil", id: "tamil" },
+                { name: "Hindi", id: "hindi" },
+                { name: "Telugu", id: "telugu" }
+              ].map((lang) => (
+                <button
+                  key={lang.id}
+                  onClick={() => setSelectedLanguage(lang.id)}
+                  className={cn(
+                    "text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-md transition-all font-bold",
+                    selectedLanguage === lang.id
+                      ? "bg-amber-500 text-white shadow-glow"
+                      : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                  )}
+                >
+                  {lang.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <ChatInput onSend={handleSendMessage} disabled={isTyping} />
         </div>
       </div>
@@ -366,7 +445,7 @@ const Index = () => {
             >
               <X className="w-8 h-8" />
             </button>
-            <MentalHealthGraph />
+            <MentalHealthGraph data={trackerData} loading={isTrackerLoading} />
           </div>
         </div>
       )}

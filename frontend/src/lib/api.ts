@@ -27,7 +27,7 @@ function getAuthHeader(): HeadersInit {
   };
 }
 
-export async function sendMessage(message: string): Promise<ChatResponse> {
+export async function sendMessage(message: string, language: string = 'english'): Promise<ChatResponse> {
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30000);
 
@@ -35,7 +35,7 @@ export async function sendMessage(message: string): Promise<ChatResponse> {
     const response = await fetch(`${API_URL}/chat`, {
       method: 'POST',
       headers: getAuthHeader(),
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ message, language }),
       signal: controller.signal
     });
 
@@ -96,4 +96,25 @@ export async function clearChatHistory(): Promise<void> {
   if (!response.ok) {
     throw new Error('Failed to clear chat history');
   }
+}
+
+export interface AnalyticsData {
+  date: string;
+  fullDate?: string;
+  mood: number;
+  strength: number;
+  stress: number;
+}
+
+export async function getAnalyticsData(): Promise<AnalyticsData[]> {
+  const response = await fetch(`${API_URL}/chat/analytics`, {
+    headers: getAuthHeader()
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) return [];
+    throw new Error('Failed to fetch analytics data');
+  }
+
+  return response.json();
 }

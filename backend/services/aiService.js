@@ -8,7 +8,9 @@ const vectorService = require('./vectorService');
 
 // Simple in-memory cache for repeat-answer avoidance
 const usedVerseIds = new Set();
-const CACHE_LIMIT = 50; 
+const usedFFIds = new Set();
+const CACHE_LIMIT = 50;
+const FF_CACHE_LIMIT = 20;
 
 class AIService {
   constructor() {
@@ -36,27 +38,28 @@ class AIService {
     this.hfEndpoint = 'https://router.huggingface.co/v1/chat/completions';
   }
 
-  async getResponse(prompt, history = [], provider = 'mistral') {
-    // Priority: Mistral -> Gemini -> HuggingFace -> OpenAI
-    console.log(`[AI] Attempting response with provider order: Mistral -> Gemini -> HF -> OpenAI`);
+  async getResponse(prompt, history = [], provider = 'gemini') {
+    // Priority: Gemini -> Mistral -> HuggingFace -> OpenAI
+    // Gemini is prioritized for better multilingual and persona depth
+    console.log(`[AI] Attempting response with provider order: Gemini -> Mistral -> HF -> OpenAI`);
 
-    // 1. Try Mistral (User provided key, very reliable)
-    if (this.mistralClient) {
-      console.log('[AI] Trying Mistral AI...');
-      try {
-        return await this._getMistralResponse(prompt, history);
-      } catch (e) {
-        console.error('[AI] Mistral Error:', e.message);
-      }
-    }
-
-    // 2. Try Gemini
+    // 1. Try Gemini
     if (this.genAI) {
       console.log('[AI] Trying Google Gemini...');
       try {
         return await this._getGeminiResponse(prompt, history);
       } catch (e) {
         console.error('[AI] Gemini Error:', e.message);
+      }
+    }
+
+    // 2. Try Mistral
+    if (this.mistralClient) {
+      console.log('[AI] Trying Mistral AI...');
+      try {
+        return await this._getMistralResponse(prompt, history);
+      } catch (e) {
+        console.error('[AI] Mistral Error:', e.message);
       }
     }
 
@@ -84,19 +87,19 @@ class AIService {
   }
 
   async _getGeminiResponse(prompt, history) {
-    // Attempting with 'v1' and fallback to 'gemini-1.5-flash' vs 'gemini-1.5-pro'
+    // Use gemini-2.0-flash as primary, with gemini-pro-latest as fallback
     let model;
     try {
-      model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: 'v1' });
+      model = this.genAI.getGenerativeModel({ model: "models/gemini-2.0-flash" });
     } catch (e) {
-      model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+      model = this.genAI.getGenerativeModel({ model: "models/gemini-pro-latest" });
     }
-    
+
     const contents = history.map(msg => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }]
     }));
-    
+
     contents.push({
       role: 'user',
       parts: [{ text: prompt }]
@@ -142,18 +145,18 @@ class AIService {
         temperature: 0.7
       },
       {
-        headers: { 
+        headers: {
           Authorization: `Bearer ${this.hfKey}`,
           'x-wait-for-model': 'true'
         },
-        timeout: 60000 
+        timeout: 60000
       }
     );
 
     if (response.data.choices && response.data.choices[0].message) {
-        return response.data.choices[0].message.content.trim();
+      return response.data.choices[0].message.content.trim();
     }
-    
+
     return JSON.stringify(response.data);
   }
 
@@ -167,6 +170,30 @@ class AIService {
     });
     return response.choices[0].message.content.trim();
   }
+
+  /**
+   * Specialized method to translate text while preserving tone
+   */
+  async translateText(text, targetLang) {
+    const prompt = `Translate the following text to ${targetLang}. 
+    Maintain the divine, wise, and poetic tone of Abimanyu. 
+    Only return the translated text without any explanations.
+    
+    TEXT:
+    ${text}`;
+
+    try {
+      // Use Gemini for translation as it's excellent for Indian languages
+      if (this.genAI) {
+        return await this._getGeminiResponse(prompt, []);
+      }
+      // Fallback to whichever provider is available
+      return await this.getResponse(prompt, []);
+    } catch (e) {
+      console.error(`[AI-Translate] Error translating to ${targetLang}:`, e.message);
+      return text;
+    }
+  }
 }
 
 const aiService = new AIService();
@@ -174,7 +201,7 @@ const aiService = new AIService();
 function detectEmotion(text) {
   text = text.toLowerCase().trim();
   let emotion = 'bravery';
-  
+
   const keywords = {
     fear: ['afraid', 'scared', 'fear', 'worry', 'anxious', 'panic', 'terrified'],
     anger: ['angry', 'hate', 'mad', 'frustrated', 'kill', 'annoyed', 'rage'],
@@ -191,19 +218,16 @@ function detectEmotion(text) {
       return key;
     }
   }
-  
+
   return emotion;
 }
 
 async function getRelevantGitaExcerpt(userInput) {
   try {
-    // Randomized and deduplicated search
-    // We pass usedVerseIds to avoid repetition
     const excludeIds = Array.from(usedVerseIds);
-    const result = await vectorService.search(userInput, 10, excludeIds, 0.7);
-    
+    const result = await vectorService.search(userInput, 10, excludeIds, 0.7, 'gita');
+
     if (result) {
-      // Add to used cache
       usedVerseIds.add(result.id);
       if (usedVerseIds.size > CACHE_LIMIT) {
         const first = usedVerseIds.values().next().value;
@@ -211,8 +235,6 @@ async function getRelevantGitaExcerpt(userInput) {
       }
       return result.text;
     }
-    
-    // Fallback to a random one if search fails or no new ones found
     return "The soul is eternal, unchanging, and indestructible. It never dies when the body is slain.";
   } catch (e) {
     console.error('Error fetching relevant Gita text:', e);
@@ -220,31 +242,64 @@ async function getRelevantGitaExcerpt(userInput) {
   }
 }
 
-async function getAbimanyuResponse(userInput, history = []) {
+async function getRelevantFreedomFighter(userInput) {
+  try {
+    const excludeIds = Array.from(usedFFIds);
+    const result = await vectorService.search(userInput, 10, excludeIds, 0.8, 'freedom_fighter');
+
+    if (result) {
+      usedFFIds.add(result.id);
+      if (usedFFIds.size > FF_CACHE_LIMIT) {
+        const first = usedFFIds.values().next().value;
+        usedFFIds.delete(first);
+      }
+      return result.text;
+    }
+    return "Tiruppur Kumaran was a brave Indian freedom fighter who died holding the Indian flag tightly.";
+  } catch (e) {
+    console.error('Error fetching relevant Freedom Fighter:', e);
+    return 'Brave heroes fought for our freedom with unwavering courage.';
+  }
+}
+
+async function getAbimanyuResponse(userInput, history = [], targetLang = 'english') {
   const emotion = detectEmotion(userInput);
   const gitaExcerpt = await getRelevantGitaExcerpt(userInput);
-  
+  const ffExcerpt = await getRelevantFreedomFighter(userInput);
+
+  const currentLang = targetLang || 'english';
+
   const PROMPT = `
     YOU ARE ABIMANYU AI, a divine and brave guide inspired by the Bhagavad Gita and India's heroic history.
     Personality: Empathetic, Poetic, Unshakeable, and Wise.
     
+    CRITICAL INSTRUCTION:
+    YOU MUST RESPOND NATIVELY IN ${currentLang.toUpperCase()}. 
+    Maintain your Abimanyu persona perfectly in ${currentLang}.
+    
     SCENARIO DATA:
     - User Message: "${userInput}"
     - Detected Underlying Emotion: ${emotion}
-    - Explicit Book Source Text to utilize:
+    - Spiritual Source (Bhagavad Gita):
     ---
     ${gitaExcerpt}
     ---
+    - Historical Source (Freedom Fighter):
+    ---
+    ${ffExcerpt}
+    ---
  
     INSTRUCTIONS:
-    1. Respond directly to the user's message as Abimanyu.
+    1. Respond directly to the user's message as Abimanyu in ${currentLang}.
     2. Actively interpret their words and validate their feelings with deep empathy.
-    3. Extract and weave in exactly ONE verse or teaching from the "Explicit Book Source Text" above, no more.
-    4. Provide an inspiring authentic historical reference to an Indian figure or warrior.
+    3. Weave in TWO specific references:
+       A. Exactly ONE teaching from the "Spiritual Source (Bhagavad Gita)" above.
+       B. Exactly ONE story/struggle from the "Historical Source (Freedom Fighter)" above.
+    4. Connect the spiritual wisdom of the Gita with the practical bravery of the freedom fighter to guide the user.
     5. Use markdown for a premium feel (bolding, blockquotes for quotes).
-    6. Conclude with a powerful, motivating sentence about growth and Dharma.
+    6. Conclude with a powerful, motivating sentence about growth and Dharma in ${currentLang}.
     7. Do NOT use any generic corporate chatbot language (like 'As an AI'). Embody your divine persona completely.
-    8. Use the language the user is speaking in (English/Tamil/Hindi) if appropriate, but primarily English with divine depth.
+    8. Use ${currentLang} for the ENTIRE response.
     9. Do NOT use any emojis in your response. Maintain a solemn and divine tone using only text and markdown.
   `;
 
@@ -261,5 +316,6 @@ async function getAbimanyuResponse(userInput, history = []) {
 }
 
 module.exports = {
-  getAbimanyuResponse
+  getAbimanyuResponse,
+  aiService
 };
