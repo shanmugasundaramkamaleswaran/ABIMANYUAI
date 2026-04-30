@@ -9,7 +9,9 @@ import { sendMessage, getChatHistory, clearChatHistory } from "@/lib/api";
 import { welcomeMessage } from "@/lib/abimanyu-responses";
 import { useAuth } from "@/lib/AuthContext";
 import { LogOut, Trash2, X, Wind, Languages } from "lucide-react";
+import ThirukkuralCard from "@/components/ThirukkuralCard";
 import BreathingCircle from "@/components/BreathingCircle";
+import { getDailyKural } from "@/lib/thirukkural";
 
 interface Message {
   id: string;
@@ -321,7 +323,8 @@ const Index = () => {
         {/* Header */}
         <WelcomeHeader />
 
-
+        {/* Daily Wisdom Section */}
+        <ThirukkuralCard kural={getDailyKural()} />
 
         {/* Chat Messages */}
         <div className="flex-1 overflow-y-auto py-6 space-y-6 flex flex-col">
