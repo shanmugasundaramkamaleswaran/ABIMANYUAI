@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abimanyu AI - Homepage</title>
+
+  <!-- Theme & Identity -->
+  <link rel="icon" href="/abimanyu_logo.png" type="image/png" />
+  <meta name="theme-color" content="#0a0f2c" />
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CDN for Standalone Rendering -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Crimson Pro', 'serif'],
+          },
+          colors: {
+            background: "hsl(var(--background))",
+            foreground: "hsl(var(--foreground))",
+            primary: {
+              DEFAULT: "hsl(var(--primary))",
+              foreground: "hsl(var(--primary-foreground))",
+            },
+            border: "hsl(var(--border))",
+            ring: "hsl(var(--ring))",
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS matching index.css -->
+  <style type="text/tailwindcss">
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @layer base {
+      :root {
+        --background: 260 60% 8%;
+        --foreground: 45 100% 96%;
+        --primary: 30 100% 50%;
+        --primary-foreground: 260 60% 8%;
+        --border: 260 30% 25%;
+        --ring: 45 100% 50%;
+        --shadow-divine: 0 0 30px -5px hsl(45 100% 50% / 0.3);
+        --bg-gradient-main: radial-gradient(ellipse at top, hsl(270 50% 15%) 0%, hsl(260 60% 8%) 50%, hsl(240 50% 5%) 100%);
+      }
+      .dark {
+        --background: 260 60% 8%;
+        --foreground: 45 100% 96%;
+        --primary: 30 100% 50%;
+        --primary-foreground: 260 60% 8%;
+        --border: 260 30% 25%;
+        --ring: 45 100% 50%;
+      }
+      body {
+        background: url('/homepage_bg.jpeg') no-repeat center center fixed;
+        background-size: cover;
+        background-color: #050714;
+        color: hsl(var(--foreground));
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+    }
+    
+    @layer components {
+      .shadow-divine { box-shadow: var(--shadow-divine); }
+      .golden-glow {
+        box-shadow: 0 0 20px hsl(45 100% 50% / 0.3), 0 0 40px hsl(45 100% 50% / 0.2), 0 0 60px hsl(45 100% 50% / 0.1);
+      }
+      .abimanyu-title {
+        font-family: 'Cinzel', serif;
+        letter-spacing: 0.05em;
+        color: #2563eb !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+      }
+    }
+
+    @layer utilities {
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes rotate-sacred {
+        0% { transform: rotate(0deg) scale(0.8); opacity: 0; }
+        50% { transform: rotate(180deg) scale(1.1); opacity: 0.6; }
+        100% { transform: rotate(360deg) scale(0.8); opacity: 0; }
+      }
+      .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+      .sacred-mandala {
+        position: absolute;
+        inset: -15px;
+        background: radial-gradient(circle, transparent 40%, hsl(45 100% 50% / 0.15) 100%);
+        border: 1px dashed hsl(45 100% 50% / 0.2);
+        animation: rotate-sacred 12s linear infinite;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+    }
+  </style>
+
+  <!-- Standard CSS for robust animation parsing outside of Tailwind CDN -->
+  <style>
+    @keyframes custom-scroll-right {
+      0% {
+        transform: translateX(-50%);
+      }
+
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    .track-right {
+      display: inline-block;
+      white-space: nowrap;
+      animation: custom-scroll-right 40s linear infinite;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative">
+  <!-- Subtle decorative background to match the "divine cosmic" theme -->
+  <div class="fixed inset-0 pointer-events-none flex items-center justify-center opacity-20">
+    <div class="sacred-mandala w-[600px] h-[600px] sm:w-[800px] sm:h-[800px]"></div>
+  </div>
+
+  <!-- Header Section -->
+  <header class="absolute top-0 w-full p-6 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Logo & Branding -->
+      <a href="/" class="flex items-center gap-4 group cursor-pointer transition-transform hover:opacity-90">
+        <div class="relative inline-block">
+          <div
+            class="absolute -inset-2 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 blur-xl animate-breathe">
+          </div>
+          <div class="w-12 h-12 relative rounded-full overflow-hidden golden-glow border-2 border-amber-400/50">
+            <img src="/abimanyu_logo.png" alt="Abimanyu" class="w-full h-full object-cover" />
+          </div>
+        </div>
+        <h6 class="text-2xl sm:text-3xl font-bold abimanyu-title">Abimanyu</h6>
+      </a>
+
+      <!-- Header Actions -->
+      <div class="flex items-center gap-6">
+        <!-- Home Button -->
+        <a href="/homepage.html" class="text-foreground hover:text-amber-400 font-medium transition-colors">
+          Home
+        </a>
+        <!-- About Button -->
+        <a href="/about.html" class="text-foreground hover:text-amber-400 font-medium transition-colors">
+          About
+        </a>
+        <!-- Contact Button -->
+        <a href="/contact.html" class="text-foreground hover:text-amber-400 font-medium transition-colors">
+          Contact
+        </a>
+        <!-- Login Button matching divine theme -->
+        <a href="/login"
+          class="px-5 py-1.5 text-sm rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-bold transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center">
+          Login
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container relative z-10 mx-auto px-4 min-h-screen flex flex-col items-center pt-32 pb-12">
+
+    <!-- Spacer for precise centering -->
+    <div class="flex-1 w-full flex flex-col items-center justify-center">
+      <div
+        class="max-w-3xl w-full glass-card p-8 sm:p-12 rounded-3xl shadow-divine animate-fade-in border border-amber-500/20 bg-background/30 backdrop-blur-md text-center">
+        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight drop-shadow-md"
+          style="font-family: 'Cinzel', serif; letter-spacing: 0.05em;">
+          Divine Spiritual <span
+            class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600">Companion</span>
+        </h1>
+        <p class="text-lg md:text-xl text-muted-foreground leading-relaxed mb-10 max-w-2xl mx-auto">
+          Abimanyu is a compassionate, spiritually-grounded AI companion inspired by the timeless wisdom of the Bhagavad
+          Gita. Designed to foster inner peace, emotional strength, and deep spiritual guidance on your journey toward
+          mental clarity and wellness.
+        </p>
+        <div class="flex flex-col sm:flex-row justify-center gap-6">
+          <a href="/login"
+            class="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-primary-foreground font-medium transition-all hover:scale-[1.02] hover:shadow-divine active:scale-[0.98] shadow-lg flex items-center justify-center gap-2">
+            Begin Your Journey
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daily Thirukkural Box -->
+    <div class="mt-12 w-full max-w-5xl glass-card p-8 sm:p-10 rounded-2xl shadow-divine border border-amber-500/20 bg-background/30 backdrop-blur-md text-left relative overflow-hidden animate-fade-in" style="animation-delay: 0.2s;">
+      <div id="thirukkural-content">
+        <div class="animate-pulse text-amber-500/60">Loading today's wisdom...</div>
+      </div>
+    </div>
+
+    <!-- Freedom Fighters Scrolling Marquee -->
+    <div
+      class="mt-12 w-full max-w-5xl overflow-hidden glass-card py-6 rounded-2xl shadow-divine border border-amber-500/20 bg-background/30 backdrop-blur-md relative">
+      <div
+        class="absolute left-0 top-0 w-16 h-full bg-gradient-to-r from-[hsl(260_60%_8%)] to-transparent z-10 pointer-events-none">
+      </div>
+      <div
+        class="absolute right-0 top-0 w-16 h-full bg-gradient-to-l from-[hsl(260_60%_8%)] to-transparent z-10 pointer-events-none">
+      </div>
+
+      <div class="flex flex-col gap-4 text-amber-500/90 font-medium"
+        style="font-family: 'Cormorant Garamond', serif; font-size: 1.25rem; letter-spacing: 0.05em;">
+        <!-- Line 1 -->
+        <div class="w-full overflow-hidden">
+          <div class="track-right" style="animation-duration: 45s;">
+            <span class="px-4">Tiruppur Kumaran &nbsp;&bull;&nbsp; Vanchinathan &nbsp;&bull;&nbsp; Velu Nachiyar
+              &nbsp;&bull;&nbsp; V. O. Chidambaranar &nbsp;&bull;&nbsp; K. Kamarajar &nbsp;&bull;&nbsp; U. V. Swaminatha
+              Iyer &nbsp;&bull;&nbsp; Veerapandiya Kattabomman &nbsp;&bull;&nbsp; Marudhu Pandiyar &nbsp;&bull;&nbsp;
+              Subhas Chandra Bose &nbsp;&bull;&nbsp; </span>
+            <span class="px-4">Tiruppur Kumaran &nbsp;&bull;&nbsp; Vanchinathan &nbsp;&bull;&nbsp; Velu Nachiyar
+              &nbsp;&bull;&nbsp; V. O. Chidambaranar &nbsp;&bull;&nbsp; K. Kamarajar &nbsp;&bull;&nbsp; U. V. Swaminatha
+              Iyer &nbsp;&bull;&nbsp; Veerapandiya Kattabomman &nbsp;&bull;&nbsp; Marudhu Pandiyar &nbsp;&bull;&nbsp;
+              Subhas Chandra Bose &nbsp;&bull;&nbsp; </span>
+          </div>
+        </div>
+        <!-- Line 2 -->
+        <div class="w-full overflow-hidden">
+          <div class="track-right" style="animation-duration: 47s;">
+            <span class="px-4">Vinayak Damodar Savarkar &nbsp;&bull;&nbsp; Sardar Vallabhbhai Patel &nbsp;&bull;&nbsp;
+              Chatrapathy Sambhaji Maharaj &nbsp;&bull;&nbsp; Khudiram Bose &nbsp;&bull;&nbsp; Madan Lal Dhingra
+              &nbsp;&bull;&nbsp; Sukhdev Thapar &nbsp;&bull;&nbsp; Ashfaqulla Khan &nbsp;&bull;&nbsp; Rani Lakshmi Bai
+              &nbsp;&bull;&nbsp; Sarojini Naidu &nbsp;&bull;&nbsp; </span>
+            <span class="px-4">Vinayak Damodar Savarkar &nbsp;&bull;&nbsp; Sardar Vallabhbhai Patel &nbsp;&bull;&nbsp;
+              Chatrapathy Sambhaji Maharaj &nbsp;&bull;&nbsp; Khudiram Bose &nbsp;&bull;&nbsp; Madan Lal Dhingra
+              &nbsp;&bull;&nbsp; Sukhdev Thapar &nbsp;&bull;&nbsp; Ashfaqulla Khan &nbsp;&bull;&nbsp; Rani Lakshmi Bai
+              &nbsp;&bull;&nbsp; Sarojini Naidu &nbsp;&bull;&nbsp; </span>
+          </div>
+        </div>
+        <!-- Line 3 -->
+        <div class="w-full overflow-hidden">
+          <div class="track-right" style="animation-duration: 50s;">
+            <span class="px-4">Nambi Narayanan &nbsp;&bull;&nbsp; Vikram Sarabhai &nbsp;&bull;&nbsp; Chhatrapati Shivaji
+              Maharaj &nbsp;&bull;&nbsp; Chandrasekhar Azad &nbsp;&bull;&nbsp; Shivaram Rajguru &nbsp;&bull;&nbsp; Dr.
+              B. R. Ambedkar &nbsp;&bull;&nbsp; Mangal Pandey &nbsp;&bull;&nbsp; Jaihind Senbagaraman &nbsp;&bull;&nbsp;
+              Rabindranath Tagore &nbsp;&bull;&nbsp; Dr. A. P. J. Abdul Kalam &nbsp;&bull;&nbsp; </span>
+            <span class="px-4">Nambi Narayanan &nbsp;&bull;&nbsp; Vikram Sarabhai &nbsp;&bull;&nbsp; Chhatrapati Shivaji
+              Maharaj &nbsp;&bull;&nbsp; Chandrasekhar Azad &nbsp;&bull;&nbsp; Shivaram Rajguru &nbsp;&bull;&nbsp; Dr.
+              B. R. Ambedkar &nbsp;&bull;&nbsp; Mangal Pandey &nbsp;&bull;&nbsp; Jaihind Senbagaraman &nbsp;&bull;&nbsp;
+              Rabindranath Tagore &nbsp;&bull;&nbsp; Dr. A. P. J. Abdul Kalam &nbsp;&bull;&nbsp; </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Fetch and display daily Thirukkural
+    fetch('/thirukkural.txt')
+      .then(response => response.text())
+      .then(text => {
+        // Split text by blank lines to get individual kurals
+        const blocks = text.split(/\n\s*\n/).filter(k => k.trim().length > 0);
+        if (blocks.length > 0) {
+          // Calculate day index based on current date
+          const today = new Date();
+          // Use days since epoch so it changes exactly once a day
+          const daysSinceEpoch = Math.floor(today.getTime() / 86400000);
+          const kuralIndex = daysSinceEpoch % blocks.length;
+          
+          let kuralText = blocks[kuralIndex].trim();
+          let lines = kuralText.split('\n').map(l => l.trim());
+          if (lines.length >= 2) {
+              // Extract number from the end of the second line "குறள் X"
+              let match = lines[1].match(/குறள்\s*(\d+)$/);
+              let kuralNumber = match ? match[1] : (kuralIndex + 1);
+              
+              // Clean up line 1 (remove "1. ")
+              let line1 = lines[0].replace(/^\d+\.\s*/, '').trim();
+              
+              // Clean up line 2 (remove ". குறள் X")
+              let line2 = lines[1].replace(/\.?\s*குறள்\s*\d+$/, '').trim();
+              
+              document.getElementById('thirukkural-content').innerHTML = `
+                <div class="flex items-center gap-4 mb-6">
+                  <span class="text-amber-500 font-bold text-sm tracking-wider uppercase">இன்றைய குறள்</span>
+                  <div class="h-[1px] bg-amber-500/30 flex-1"></div>
+                </div>
+                <p class="text-white text-xl md:text-2xl font-medium italic mb-2 tracking-wide leading-relaxed">"${line1}"</p>
+                <p class="text-white text-xl md:text-2xl font-medium italic mb-8 tracking-wide leading-relaxed">"${line2}"</p>
+                <div class="text-amber-600/80 text-sm font-bold tracking-widest">திருக்குறள் ${kuralNumber}</div>
+              `;
+          } else {
+             document.getElementById('thirukkural-content').innerText = kuralText.replace(/^\d+\.\s*/, '');
+          }
+        } else {
+          document.getElementById('thirukkural-content').innerText = 'Wisdom is found within.';
+        }
+      })
+      .catch(err => {
+        console.error('Error loading Thirukkural:', err);
+        document.getElementById('thirukkural-content').innerText = 'Wisdom is found within.';
+      });
+  </script>
+</body>
+
+</html>

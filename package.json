@@ -1,0 +1,15 @@
+{
+    "name": "abimanyu-ai-root",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "install:all": "npm install --prefix frontend && npm install --prefix backend",
+        "backend": "npm start --prefix backend",
+        "frontend": "npm run dev --prefix frontend",
+        "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+        "check": "curl http://localhost:8000/health"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2"
+    }
+}

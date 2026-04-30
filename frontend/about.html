@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abimanyu AI - Homepage</title>
+  
+  <!-- Theme & Identity -->
+  <link rel="icon" href="/abimanyu_logo.png" type="image/png" />
+  <meta name="theme-color" content="#0a0f2c" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CDN for Standalone Rendering -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Crimson Pro', 'serif'],
+          },
+          colors: {
+            background: "hsl(var(--background))",
+            foreground: "hsl(var(--foreground))",
+            primary: {
+              DEFAULT: "hsl(var(--primary))",
+              foreground: "hsl(var(--primary-foreground))",
+            },
+            border: "hsl(var(--border))",
+            ring: "hsl(var(--ring))",
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS matching index.css -->
+  <style type="text/tailwindcss">
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @layer base {
+      :root {
+        --background: 260 60% 8%;
+        --foreground: 45 100% 96%;
+        --primary: 30 100% 50%;
+        --primary-foreground: 260 60% 8%;
+        --border: 260 30% 25%;
+        --ring: 45 100% 50%;
+        --shadow-divine: 0 0 30px -5px hsl(45 100% 50% / 0.3);
+        --bg-gradient-main: radial-gradient(ellipse at top, hsl(270 50% 15%) 0%, hsl(260 60% 8%) 50%, hsl(240 50% 5%) 100%);
+      }
+      .dark {
+        --background: 260 60% 8%;
+        --foreground: 45 100% 96%;
+        --primary: 30 100% 50%;
+        --primary-foreground: 260 60% 8%;
+        --border: 260 30% 25%;
+        --ring: 45 100% 50%;
+      }
+      body {
+        background: url('/homepage_bg.jpeg') no-repeat center center fixed;
+        background-size: cover;
+        background-color: #050714;
+        color: hsl(var(--foreground));
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+    }
+    
+    @layer components {
+      .shadow-divine { box-shadow: var(--shadow-divine); }
+      .golden-glow {
+        box-shadow: 0 0 20px hsl(45 100% 50% / 0.3), 0 0 40px hsl(45 100% 50% / 0.2), 0 0 60px hsl(45 100% 50% / 0.1);
+      }
+      .abimanyu-title {
+        font-family: 'Cinzel', serif;
+        letter-spacing: 0.05em;
+        color: #2563eb !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+      }
+    }
+
+    @layer utilities {
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes rotate-sacred {
+        0% { transform: rotate(0deg) scale(0.8); opacity: 0; }
+        50% { transform: rotate(180deg) scale(1.1); opacity: 0.6; }
+        100% { transform: rotate(360deg) scale(0.8); opacity: 0; }
+      }
+      .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+      .sacred-mandala {
+        position: absolute;
+        inset: -15px;
+        background: radial-gradient(circle, transparent 40%, hsl(45 100% 50% / 0.15) 100%);
+        border: 1px dashed hsl(45 100% 50% / 0.2);
+        animation: rotate-sacred 12s linear infinite;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative">
+  <!-- Subtle decorative background to match the "divine cosmic" theme -->
+  <div class="fixed inset-0 pointer-events-none flex items-center justify-center opacity-20">
+    <div class="sacred-mandala w-[600px] h-[600px] sm:w-[800px] sm:h-[800px]"></div>
+  </div>
+
+  <!-- Header Section -->
+  <header class="absolute top-0 w-full p-6 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Logo & Branding -->
+      <a href="/" class="flex items-center gap-4 group cursor-pointer transition-transform hover:opacity-90">
+        <div class="relative inline-block">
+          <div class="absolute -inset-2 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 blur-xl animate-breathe"></div>
+          <div class="w-12 h-12 relative rounded-full overflow-hidden golden-glow border-2 border-amber-400/50">
+            <img src="/abimanyu_logo.png" alt="Abimanyu" class="w-full h-full object-cover" />
+          </div>
+        </div>
+        <h6 class="text-2xl sm:text-3xl font-bold abimanyu-title">Abimanyu</h6>
+      </a>
+
+      <!-- Header Actions -->
+      <div class="flex items-center gap-4">
+        <!-- Home Button -->
+        <a 
+          href="/homepage.html" 
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center"
+        >
+          Home
+        </a>
+        <!-- About Button -->
+        <a 
+          href="/about.html" 
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center"
+        >
+          About
+        </a>
+        <!-- Contact Button -->
+        <a 
+          href="/contact.html" 
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center"
+        >
+          Contact
+        </a>
+        <!-- Login Button matching divine theme -->
+        <a 
+          href="/login" 
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center"
+        >
+          Login
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container relative z-10 mx-auto px-4 min-h-screen flex flex-col items-center justify-center py-32">
+    <div class="max-w-4xl w-full glass-card p-8 sm:p-12 rounded-3xl shadow-divine animate-fade-in border border-amber-500/20 bg-background/30 backdrop-blur-md text-left mt-8 mb-8">
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-10 drop-shadow-md text-center" style="font-family: 'Cinzel', serif; letter-spacing: 0.05em;">
+        The Legacy of <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600">Abimanyu</span>
+      </h1>
+      <div class="text-base md:text-lg text-muted-foreground leading-relaxed space-y-6">
+        <p>Abimanyu stands as one of the most courageous and inspiring warriors in the epic Mahabharata. He was the son of Arjuna, the great Pandava prince, and Subhadra, the sister of Lord Krishna. Born into a family of valor and righteousness, Abimanyu carried the legacy of bravery from a very young age.</p>
+        <p>During the time when Arjuna was in exile (vanavasam), it was Lord Krishna who took on the role of both mentor and protector to the young prince. Under Krishna’s guidance, Abimanyu was not only trained in the art of warfare but also in the principles of dharma, discipline, and moral strength. Krishna shaped him into a warrior who was not just powerful in battle, but also noble in character and firm in his values.</p>
+        <p>As he grew, Abimanyu displayed extraordinary skill, intelligence, and fearlessness. Even the greatest warriors of his time recognized his potential. At the young age of sixteen, he married Uttara, the princess of Matsya, marking the beginning of a new chapter in his life. However, destiny had already prepared him for a far greater role — that of a warrior in the Kurukshetra war.</p>
+        <p>When Abimanyu entered the battlefield, he fought with unmatched energy and determination. His grandfather Bhishma himself was astonished by the young warrior’s strength, speed, and precision. It was clear that Abimanyu was not just a prince, but a rising legend.</p>
+        <p>The most defining moment of his life came on the thirteenth day of the Kurukshetra war. On that day, Arjuna was drawn away to fight on another front. Seizing this opportunity, Dronacharya formed the deadly Chakravyuha — a complex and nearly impenetrable military formation. Inside this formation stood some of the most powerful warriors of the Kaurava army, including Duryodhana, Dushasana, Ashwatthama, Karna, and Shakuni.</p>
+        <p>Abimanyu was the only warrior among the Pandavas who knew how to enter the Chakravyuha, though he did not know how to exit it. Yet, without hesitation, and driven by his duty to protect dharma, he stepped forward. With fearless determination, he broke into the formation, fighting wave after wave of enemies.</p>
+        <p>Inside the Chakravyuha, Abimanyu fought like a storm. He defeated numerous warriors and shattered the confidence of the Kaurava army. His courage shook even the mightiest of opponents. However, the Kaurava warriors, unable to defeat him in fair combat, broke the rules of war. They attacked him together, surrounding him from all sides.</p>
+        <p>Even when his weapons were destroyed and his chariot was broken, Abimanyu did not retreat. He continued to fight with whatever he could find — a sword, a wheel, and finally, sheer willpower. He stood alone against many, embodying the true spirit of a warrior.</p>
+        <p>In the end, overwhelmed by the combined attack, Abimanyu fell on the battlefield. Karna played a crucial role in this final assault. Yet, even in victory, there was no pride among his enemies. It is said that Karna himself acknowledged that neither he nor Arjuna truly won that day. Instead, the true victor was Abimanyu — the young warrior who refused to surrender, who stood for dharma, and who etched his name into history through his sacrifice.</p>
+        <p>Abimanyu’s story is not just a tale of war, but a timeless lesson in courage, duty, and honor. Though his life was short, his legacy remains eternal — a symbol of bravery that continues to inspire generations.</p>
+      </div>
+    </div>
+  </main>
+
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abimanyu AI - Homepage</title>
+
+  <!-- Theme & Identity -->
+  <link rel="icon" href="/abimanyu_logo.png" type="image/png" />
+  <meta name="theme-color" content="#0a0f2c" />
+
+  <!-- Fonts -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Tailwind CDN for Standalone Rendering -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Crimson Pro', 'serif'],
+          },
+          colors: {
+            background: "hsl(var(--background))",
+            foreground: "hsl(var(--foreground))",
+            primary: {
+              DEFAULT: "hsl(var(--primary))",
+              foreground: "hsl(var(--primary-foreground))",
+            },
+            border: "hsl(var(--border))",
+            ring: "hsl(var(--ring))",
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom CSS matching index.css -->
+  <style type="text/tailwindcss">
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
+
+    @layer base {
+      :root {
+        --background: 260 60% 8%;
+        --foreground: 45 100% 96%;
+        --primary: 30 100% 50%;
+        --primary-foreground: 260 60% 8%;
+        --border: 260 30% 25%;
+        --ring: 45 100% 50%;
+        --shadow-divine: 0 0 30px -5px hsl(45 100% 50% / 0.3);
+        --bg-gradient-main: radial-gradient(ellipse at top, hsl(270 50% 15%) 0%, hsl(260 60% 8%) 50%, hsl(240 50% 5%) 100%);
+      }
+      .dark {
+        --background: 260 60% 8%;
+        --foreground: 45 100% 96%;
+        --primary: 30 100% 50%;
+        --primary-foreground: 260 60% 8%;
+        --border: 260 30% 25%;
+        --ring: 45 100% 50%;
+      }
+      body {
+        background: url('/homepage_bg.jpeg') no-repeat center center fixed;
+        background-size: cover;
+        background-color: #050714;
+        color: hsl(var(--foreground));
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+    }
+    
+    @layer components {
+      .shadow-divine { box-shadow: var(--shadow-divine); }
+      .golden-glow {
+        box-shadow: 0 0 20px hsl(45 100% 50% / 0.3), 0 0 40px hsl(45 100% 50% / 0.2), 0 0 60px hsl(45 100% 50% / 0.1);
+      }
+      .abimanyu-title {
+        font-family: 'Cinzel', serif;
+        letter-spacing: 0.05em;
+        color: #2563eb !important;
+        font-weight: 700 !important;
+        text-shadow: 0 0 15px rgba(37, 99, 235, 0.4);
+      }
+    }
+
+    @layer utilities {
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes rotate-sacred {
+        0% { transform: rotate(0deg) scale(0.8); opacity: 0; }
+        50% { transform: rotate(180deg) scale(1.1); opacity: 0.6; }
+        100% { transform: rotate(360deg) scale(0.8); opacity: 0; }
+      }
+      .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
+      .sacred-mandala {
+        position: absolute;
+        inset: -15px;
+        background: radial-gradient(circle, transparent 40%, hsl(45 100% 50% / 0.15) 100%);
+        border: 1px dashed hsl(45 100% 50% / 0.2);
+        animation: rotate-sacred 12s linear infinite;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen relative">
+  <!-- Subtle decorative background to match the "divine cosmic" theme -->
+  <div class="fixed inset-0 pointer-events-none flex items-center justify-center opacity-20">
+    <div class="sacred-mandala w-[600px] h-[600px] sm:w-[800px] sm:h-[800px]"></div>
+  </div>
+
+  <!-- Header Section -->
+  <header class="absolute top-0 w-full p-6 z-50">
+    <div class="container mx-auto flex justify-between items-center">
+      <!-- Logo & Branding -->
+      <a href="/" class="flex items-center gap-4 group cursor-pointer transition-transform hover:opacity-90">
+        <div class="relative inline-block">
+          <div
+            class="absolute -inset-2 rounded-full bg-gradient-to-r from-amber-500/20 via-yellow-400/30 to-amber-500/20 blur-xl animate-breathe">
+          </div>
+          <div class="w-12 h-12 relative rounded-full overflow-hidden golden-glow border-2 border-amber-400/50">
+            <img src="/abimanyu_logo.png" alt="Abimanyu" class="w-full h-full object-cover" />
+          </div>
+        </div>
+        <h6 class="text-2xl sm:text-3xl font-bold abimanyu-title">Abimanyu</h6>
+      </a>
+
+      <!-- Header Actions -->
+      <div class="flex items-center gap-4">
+        <!-- Home Button -->
+        <a href="/homepage.html"
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center">
+          Home
+        </a>
+        <!-- About Button -->
+        <a href="/about.html"
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center">
+          About
+        </a>
+        <!-- Contact Button -->
+        <a href="/contact.html"
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center">
+          Contact
+        </a>
+        <!-- Login Button matching divine theme -->
+        <a href="/login"
+          class="px-6 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-medium transition-all hover:scale-[1.05] active:scale-[0.95] shadow-divine flex items-center justify-center">
+          Login
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="container relative z-10 mx-auto px-4 min-h-screen flex flex-col items-center justify-center py-32">
+    <div
+      class="max-w-2xl w-full glass-card p-8 sm:p-12 rounded-3xl shadow-divine animate-fade-in border border-amber-500/20 bg-background/30 backdrop-blur-md text-left mt-8 mb-8">
+      <h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 drop-shadow-md text-center"
+        style="font-family: 'Cinzel', serif; letter-spacing: 0.05em;">
+        Contact <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-600">Us</span>
+      </h1>
+      <p class="text-lg text-muted-foreground leading-relaxed mb-10 text-center">
+        Have questions or seeking guidance? Send us a message and we will respond to you shortly.
+      </p>
+
+      <form action="https://api.web3forms.com/submit" method="POST" class="flex flex-col gap-6">
+        <!-- Replace with your Web3Forms Access Key -->
+        <input type="hidden" name="access_key" value="96658576-18a8-4a65-a23d-8831622a744b">
+        <!-- Optional: redirect to a thank you page or the same page -->
+        <input type="hidden" name="redirect" value="http://localhost:8080/contact.html">
+
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-amber-500">Your Name</label>
+          <input type="text" name="name" placeholder="Enter your name"
+            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
+            required>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-amber-500">Email Address</label>
+          <input type="email" name="email" placeholder="Enter your email"
+            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all"
+            required>
+        </div>
+        <div class="flex flex-col gap-2">
+          <label class="text-sm font-semibold text-amber-500">Message</label>
+          <textarea name="message" rows="5" placeholder="How can we help you?"
+            class="w-full px-4 py-3 rounded-xl bg-black/40 border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition-all resize-none"
+            required></textarea>
+        </div>
+
+        <button type="submit"
+          class="w-full py-3 mt-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-divine flex justify-center items-center">
+          Send Message
+        </button>
+      </form>
+    </div>
+  </main>
+
+</body>
+
+</html>
