@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+textblob
+python-dotenv
+openai
+anthropic
+huggingface_hub
+requests
+elevenlabs
+sqlalchemy
+passlib[bcrypt]
+PyJWT
+aiosqlite
+pdfplumber
+llm
