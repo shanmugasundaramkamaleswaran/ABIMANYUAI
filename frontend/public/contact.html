@@ -175,11 +175,9 @@
         Have questions or seeking guidance? Send us a message and we will respond to you shortly.
       </p>
 
-      <form action="https://api.web3forms.com/submit" method="POST" class="flex flex-col gap-6">
+      <form id="contact-form" action="https://api.web3forms.com/submit" method="POST" class="flex flex-col gap-6">
         <!-- Replace with your Web3Forms Access Key -->
         <input type="hidden" name="access_key" value="96658576-18a8-4a65-a23d-8831622a744b">
-        <!-- Optional: redirect to a thank you page or the same page -->
-        <input type="hidden" name="redirect" value="http://localhost:8080/contact.html">
 
         <div class="flex flex-col gap-2">
           <label class="text-sm font-semibold text-amber-500">Your Name</label>
@@ -200,7 +198,7 @@
             required></textarea>
         </div>
 
-        <button type="submit"
+        <button type="submit" id="submit-btn"
           class="w-full py-3 mt-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-bold transition-all hover:scale-[1.02] active:scale-[0.98] shadow-divine flex justify-center items-center">
           Send Message
         </button>
@@ -208,6 +206,77 @@
     </div>
   </main>
 
+  <!-- Success Popup Modal -->
+  <div id="success-modal" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#0a0f2c]/60 backdrop-blur-xl opacity-0 pointer-events-none transition-opacity duration-300">
+    <div class="max-w-md w-full glass-card p-8 rounded-3xl shadow-divine border border-amber-500/20 bg-background/30 backdrop-blur-md text-center transform scale-90 transition-transform duration-300" id="modal-content">
+      <div class="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+        <svg class="w-8 h-8 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+      </div>
+      <h2 class="text-2xl font-bold abimanyu-title mb-4">Message Sent!</h2>
+      <p class="text-muted-foreground mb-8">
+        Your message has been received. We will respond to you shortly.
+      </p>
+      <button onclick="closeModal()" class="px-8 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 text-[#0a0f2c] font-bold transition-all hover:scale-105 shadow-divine">
+        Dismiss
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('contact-form');
+    const modal = document.getElementById('success-modal');
+    const modalContent = document.getElementById('modal-content');
+    const submitBtn = document.getElementById('submit-btn');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const originalBtnText = submitBtn.innerText;
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Sending...";
+      submitBtn.style.opacity = "0.7";
+
+      const formData = new FormData(form);
+      const object = Object.fromEntries(formData);
+      const json = JSON.stringify(object);
+
+      fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: json
+      })
+      .then(async (response) => {
+        let json = await response.json();
+        if (response.status == 200) {
+          modal.classList.remove('opacity-0', 'pointer-events-none');
+          modalContent.classList.remove('scale-90');
+          form.reset();
+        } else {
+          console.log(response);
+          alert(json.message);
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        alert("Something went wrong!");
+      })
+      .then(function() {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+        submitBtn.style.opacity = "1";
+      });
+    });
+
+    function closeModal() {
+      modal.classList.add('opacity-0', 'pointer-events-none');
+      modalContent.classList.add('scale-90');
+    }
+  </script>
 </body>
 
 </html>
