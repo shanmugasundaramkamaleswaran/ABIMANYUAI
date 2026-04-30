@@ -5,7 +5,7 @@ import ChatMessage from "@/components/ChatMessage";
 import ChatInput from "@/components/ChatInput";
 import TopMenu from "@/components/TopMenu";
 import MentalHealthGraph from "@/components/MentalHealthGraph";
-import { sendMessage, getChatHistory, clearChatHistory } from "@/lib/api";
+import { sendMessage, getChatHistory, clearChatHistory, saveAnalyticsToFirebase, subscribeToAnalytics, generateElevenLabsSpeech } from "@/lib/api";
 import { welcomeMessage } from "@/lib/abimanyu-responses";
 import { useAuth } from "@/lib/AuthContext";
 import { LogOut, Trash2, X, Wind, Languages } from "lucide-react";
@@ -31,22 +31,15 @@ const Index = () => {
   const [isTrackerLoading, setIsTrackerLoading] = useState(false);
 
   useEffect(() => {
-    if (showTracker) {
-      const fetchAnalytics = async () => {
-        setIsTrackerLoading(true);
-        try {
-          const { getAnalyticsData } = await import("@/lib/api");
-          const data = await getAnalyticsData();
-          setTrackerData(data);
-        } catch (error) {
-          console.error("Failed to fetch tracker data:", error);
-        } finally {
-          setIsTrackerLoading(false);
-        }
-      };
-      fetchAnalytics();
+    if (showTracker && user) {
+      setIsTrackerLoading(true);
+      const unsubscribe = subscribeToAnalytics(user.email, (data) => {
+        setTrackerData(data);
+        setIsTrackerLoading(false);
+      });
+      return () => unsubscribe();
     }
-  }, [showTracker]);
+  }, [showTracker, user]);
 
   const [isCalmActive, setIsCalmActive] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("english");
@@ -109,58 +102,70 @@ const Index = () => {
 
       setMessages(prev => [...prev, abimanyuMessage]);
 
+      // Save to Firebase for real-time tracking
+      if (user && response.mood) {
+        saveAnalyticsToFirebase(user.email, response.mood);
+      }
+
       if (response.audio) {
         const audio = new Audio(`data:audio/mp3;base64,${response.audio}`);
         audio.play().catch(e => console.error("Audio playback error:", e));
-      } else if ('speechSynthesis' in window) {
-        const speak = () => {
-          const utterance = new SpeechSynthesisUtterance(response.reply);
-          
-          // Map selecting language to BCP 47 language tags
-          const langMap: Record<string, string> = {
-            english: 'en-IN',
-            tamil: 'ta-IN',
-            hindi: 'hi-IN',
-            telugu: 'te-IN'
+      } else {
+        // Try ElevenLabs first if API key is present
+        const elevenLabsAudio = await generateElevenLabsSpeech(response.reply);
+        if (elevenLabsAudio) {
+          const audio = new Audio(elevenLabsAudio);
+          audio.play().catch(e => console.error("ElevenLabs playback error:", e));
+        } else if ('speechSynthesis' in window) {
+          const speak = () => {
+            const utterance = new SpeechSynthesisUtterance(response.reply);
+            
+            // Map selecting language to BCP 47 language tags
+            const langMap: Record<string, string> = {
+              english: 'en-IN',
+              tamil: 'ta-IN',
+              hindi: 'hi-IN',
+              telugu: 'te-IN'
+            };
+            const targetLang = langMap[selectedLanguage.toLowerCase()] || 'en-IN';
+            const targetLangCode = targetLang.split('-')[0]; // 'ta', 'hi', 'te', 'en'
+            
+            utterance.lang = targetLang;
+            utterance.rate = 0.9;
+            utterance.pitch = 1.0; // Slightly lower pitch for deeper voice
+            utterance.volume = 1.0;
+
+            const voices = window.speechSynthesis.getVoices();
+            
+            // 1. Try to find a male voice for the specific language
+            let selectedVoice = voices.find(voice => 
+              voice.lang.startsWith(targetLangCode) && 
+              (voice.name.toLowerCase().includes('male') || voice.name.toLowerCase().includes('david'))
+            );
+            
+            // 2. If no male voice, just get any voice for that language
+            if (!selectedVoice) {
+              selectedVoice = voices.find(voice => voice.lang.startsWith(targetLangCode));
+            }
+            
+            // 3. Fallback to any Indian voice, then any English male, etc.
+            if (!selectedVoice) {
+               selectedVoice = voices.find(v => v.lang.startsWith('en-IN')) || 
+                               voices.find(v => v.name.toLowerCase().includes('male'));
+            }
+
+            if (selectedVoice) {
+               utterance.voice = selectedVoice;
+            }
+            
+            window.speechSynthesis.speak(utterance);
           };
-          const targetLang = langMap[selectedLanguage.toLowerCase()] || 'en-IN';
-          const targetLangCode = targetLang.split('-')[0]; // 'ta', 'hi', 'te', 'en'
-          
-          utterance.lang = targetLang;
-          utterance.rate = 0.9;
-          utterance.pitch = 1.0; // Slightly lower pitch for deeper voice
-          utterance.volume = 1.0;
 
-          const voices = window.speechSynthesis.getVoices();
-          
-          // 1. Try to find a male voice for the specific language
-          let selectedVoice = voices.find(voice => 
-            voice.lang.startsWith(targetLangCode) && 
-            (voice.name.toLowerCase().includes('male') || voice.name.toLowerCase().includes('david'))
-          );
-          
-          // 2. If no male voice, just get any voice for that language
-          if (!selectedVoice) {
-            selectedVoice = voices.find(voice => voice.lang.startsWith(targetLangCode));
+          if (window.speechSynthesis.getVoices().length === 0) {
+            window.speechSynthesis.addEventListener('voiceschanged', speak, { once: true });
+          } else {
+            speak();
           }
-          
-          // 3. Fallback to any Indian voice, then any English male, etc.
-          if (!selectedVoice) {
-             selectedVoice = voices.find(v => v.lang.startsWith('en-IN')) || 
-                             voices.find(v => v.name.toLowerCase().includes('male'));
-          }
-
-          if (selectedVoice) {
-             utterance.voice = selectedVoice;
-          }
-          
-          window.speechSynthesis.speak(utterance);
-        };
-
-        if (window.speechSynthesis.getVoices().length === 0) {
-          window.speechSynthesis.addEventListener('voiceschanged', speak, { once: true });
-        } else {
-          speak();
         }
       }
     } catch (error: any) {

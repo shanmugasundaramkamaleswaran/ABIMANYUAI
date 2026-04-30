@@ -48,15 +48,6 @@ const ChatMessage = ({ message, isAbimanyu, animate = true, showLeaf = false, mo
           </div>
         )}
 
-        {showLeaf && (
-          <div className="absolute -top-6 -left-2 w-8 h-8 opacity-90 animate-float z-20 pointer-events-none">
-            <img
-              src="/peepal_leaf.png"
-              alt="Sacred Leaf"
-              className="w-full h-full object-contain filter drop-shadow-[0_0_8px_rgba(230,201,122,0.4)]"
-            />
-          </div>
-        )}
 
         <div className="flex flex-col gap-2">
           {isAbimanyu && displayMood && (

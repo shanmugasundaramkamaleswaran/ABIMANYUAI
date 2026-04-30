@@ -15,10 +15,25 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
-const auth = getAuth(app);
-const db = getFirestore(app);
+// Initialize Firebase only if config is present to prevent crash
+const isFirebaseConfigValid = !!firebaseConfig.apiKey;
+
+let app;
+let analytics = null;
+let auth = null;
+let db = null;
+
+if (isFirebaseConfigValid) {
+  try {
+    app = initializeApp(firebaseConfig);
+    analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
+    auth = getAuth(app);
+    db = getFirestore(app);
+  } catch (error) {
+    console.error("Firebase initialization failed:", error);
+  }
+} else {
+  console.warn("Firebase configuration missing. Real-time analytics features will be disabled.");
+}
 
 export { app, analytics, auth, db };
